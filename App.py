@@ -180,21 +180,34 @@ def create_empty_daily_tracker():
     })
 
 def create_empty_leads_database():
+    """Create empty leads database with all expected columns from linkedin-tracking-csv.csv"""
     return pd.DataFrame({
-        'Name': [],
-        'LinkedIn_URL': [],
-        'Date_Connected': [],
-        'Connection_Status': [],
-        'Stage': [],
-        'Initial_Message_Sent': [],
-        'Interested': [],
-        'Link_Sent_Date': [],
-        'Follow_Up_1_Date': [],
-        'Follow_Up_2_Date': [],
-        'Follow_Up_3_Date': [],
-        'Follow_Up_4_Date': [],
-        'Converted': [],
-        'Notes': []
+        'timestamp': [],
+        'profile_name': [],
+        'profile_location': [],
+        'profile_tagline': [],
+        'linkedin_url': [],
+        'linkedin_subject': [],
+        'linkedin_message': [],
+        'email_subject': [],
+        'email_message': [],
+        'outreach_strategy': [],
+        'personalization_points': [],
+        'follow_up_suggestions': [],
+        'connection_status': [],
+        'browserflow_session': [],
+        'success': [],
+        'credits_used': [],
+        'error_message': [],
+        'status': [],
+        'search_term': [],
+        'search_city': [],
+        'search_country': [],
+        'name': [],
+        'image_url': [],
+        'tagline': [],
+        'location': [],
+        'summary': []
     })
 
 # Initialize session state
