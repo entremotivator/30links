@@ -124,7 +124,7 @@ st.markdown("""
 DAILY_TRACKER_SHEET_ID = "1UkuTf8VwGPIilTxhTEdP9K-zdtZFnThazFdGyxVYfmg"
 LEADS_DATABASE_SHEET_ID = "1eLEFvyV1_f74UC1g5uQ-xA7A62sK8Pog27KIjw_Sk3Y"
 DAILY_TRACKER_SHEET_NAME = "daily_tracker_20251021"
-LEADS_SHEET_GID = "1881909623"
+LEADS_SHEET_GID = "1881909623"  # linkedin-tracking-csv.csv sheet
 
 # Function to get sheet data by GID
 def get_sheet_by_gid(sheet_id, gid):
@@ -178,7 +178,7 @@ def load_daily_tracker():
 # Load leads database
 @st.cache_data(ttl=60)
 def load_leads_database():
-    """Load leads database from linkedin-tracking-csv.csv sheet"""
+    """Load leads database from linkedin-tracking-csv.csv sheet (GID: 1881909623)"""
     try:
         df = get_sheet_by_gid(LEADS_DATABASE_SHEET_ID, LEADS_SHEET_GID)
 
@@ -186,19 +186,24 @@ def load_leads_database():
             df.columns = df.columns.str.strip()
 
             expected_columns = [
-                'timestamp', 'profile_name', 'profile_location', 'profile_tagline',
+                'timestamp', 'name', 'profile_name', 'profile_location', 'profile_tagline',
                 'linkedin_url', 'linkedin_subject', 'linkedin_message',
                 'email_subject', 'email_message', 'outreach_strategy',
                 'personalization_points', 'follow_up_suggestions', 'connection_status',
                 'browserflow_session', 'success', 'credits_used', 'error_message',
                 'status', 'search_term', 'search_city', 'search_country',
-                'name', 'image_url', 'tagline', 'location', 'summary'
+                'image_url', 'tagline', 'location', 'summary'
             ]
 
             available_columns = [col for col in expected_columns if col in df.columns]
 
             if available_columns:
                 df = df[available_columns]
+
+            if 'name' not in df.columns and 'profile_name' in df.columns:
+                df['name'] = df['profile_name']
+            elif 'profile_name' not in df.columns and 'name' in df.columns:
+                df['profile_name'] = df['name']
 
             if 'success' in df.columns:
                 df['success'] = df['success'].astype(str).str.lower().isin(['true', 'yes', '1', 't'])
@@ -213,7 +218,7 @@ def load_leads_database():
 
         return create_empty_leads_database()
     except Exception as e:
-        st.sidebar.error(f"Error loading leads: {str(e)}")
+        st.sidebar.error(f"Error loading leads from linkedin-tracking-csv.csv: {str(e)}")
         return create_empty_leads_database()
 
 # Create empty dataframes
@@ -240,6 +245,7 @@ def create_empty_leads_database():
     """Create empty leads database"""
     return pd.DataFrame({
         'timestamp': [],
+        'name': [],  # Added 'name' as primary field
         'profile_name': [],
         'profile_location': [],
         'profile_tagline': [],
@@ -260,7 +266,6 @@ def create_empty_leads_database():
         'search_term': [],
         'search_city': [],
         'search_country': [],
-        'name': [],
         'image_url': [],
         'tagline': [],
         'location': [],
@@ -421,9 +426,9 @@ def send_webhook_request(webhook_url, payload):
     except Exception as e:
         return False, str(e)
 
-def generate_lead_id(profile_name, linkedin_url):
-    """Generate unique lead ID"""
-    unique_string = f"{profile_name}_{linkedin_url}_{datetime.now().isoformat()}"
+def generate_lead_id(name, linkedin_url):
+    """Generate unique lead ID using name instead of profile_name"""
+    unique_string = f"{name}_{linkedin_url}_{datetime.now().isoformat()}"
     return hashlib.md5(unique_string.encode()).hexdigest()[:12]
 
 def filter_dataframe(df, filters):
@@ -1089,10 +1094,10 @@ with tab3:
 # TAB 4: LEADS CRM
 with tab4:
     st.markdown("## 👥 Leads CRM - From Google Sheets")
-    st.caption("Data from linkedin-tracking-csv.csv sheet")
+    st.caption("Data from linkedin-tracking-csv.csv sheet (GID: 1881909623)")
 
     if leads_df is not None and not leads_df.empty:
-        st.success(f"✅ Loaded {len(leads_df)} leads from Google Sheets")
+        st.success(f"✅ Loaded {len(leads_df)} leads from linkedin-tracking-csv.csv")
 
         # Summary metrics
         col1, col2, col3, col4 = st.columns(4)
@@ -1166,7 +1171,7 @@ with tab4:
 
         display_cols = []
         priority_display = [
-            'timestamp', 'profile_name', 'name', 'profile_location', 'location',
+            'timestamp', 'name', 'profile_name', 'profile_location', 'location',
             'profile_tagline', 'tagline', 'linkedin_url', 'connection_status',
             'success', 'search_term', 'outreach_strategy'
         ]
@@ -1197,7 +1202,7 @@ with tab4:
         )
 
     else:
-        st.warning("⚠️ No leads data loaded from Google Sheets")
+        st.warning("⚠️ No leads data loaded from linkedin-tracking-csv.csv sheet")
         st.info("📌 Click '⬇️ Load Sheets' button in the sidebar to fetch lead data")
 
 # TAB 5: ADVANCED SEARCH
@@ -1471,7 +1476,7 @@ with tab6:
         st.markdown("### 💬 Recent Conversations")
 
         for idx, row in leads_df.head(20).iterrows():
-            profile_name = row.get('profile_name', row.get('name', 'Unknown'))
+            profile_name = row.get('name', row.get('profile_name', 'Unknown'))
             linkedin_url = row.get('linkedin_url', '#')
             message = row.get('linkedin_message', 'No message')
             timestamp = row.get('timestamp', 'N/A')
@@ -1551,359 +1556,8 @@ with tab7:
                     st.session_state.email_queue.pop(idx)
                     st.rerun()
 
-# TAB 5: ADVANCED SEARCH (This was TAB 5 in the updates, mapped to TAB 5 here)
-with tab5:
-    st.markdown("## 🔍 Advanced Lead Search & Generation")
-    st.markdown("*Search and connect with decision-makers worldwide*")
 
-    st.markdown("""
-    <div style='background: rgba(255, 255, 255, 0.95); padding: 2.5rem; border-radius: 25px;
-                text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin-bottom: 3rem;'>
-        <h2 style='color: #667eea; margin-bottom: 1rem; font-weight: 800;'>🌍 Global Business Intelligence</h2>
-        <p style='color: #666; font-size: 1.2rem; line-height: 1.8;'>
-            Search and connect with decision-makers worldwide. Target by job title, location, industry,
-            and company size to generate highly qualified leads instantly.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Expanded job titles (100+)
-    SEARCH_TERMS = [
-        "Business Owner", "CEO", "Founder", "President", "Co-Founder", "Managing Director",
-        "VP of Sales", "VP of Marketing", "Marketing Director", "Sales Director", "Chief Operating Officer",
-        "Chief Financial Officer", "Chief Marketing Officer", "Chief Technology Officer", "Chief Strategy Officer",
-        "Partner", "Investor", "Consultant", "Business Analyst", "Strategic Advisor", "Operations Manager",
-        "Growth Manager", "Product Manager", "Head of Business Development", "Sales Executive", "Client Relations Manager",
-        "Customer Success Manager", "Account Executive", "Regional Manager", "General Manager", "Division Head",
-        "Chief Revenue Officer", "Chief Commercial Officer", "Chief Innovation Officer", "Chief Data Officer",
-        "Chief Information Officer", "Chief People Officer", "Chief Legal Officer", "Chief Compliance Officer",
-        "Director of Operations", "Director of Finance", "Director of HR", "Director of IT", "Director of Engineering",
-        "VP of Engineering", "VP of Product", "VP of Operations", "VP of Finance", "VP of HR",
-        "Head of Sales", "Head of Marketing", "Head of Growth", "Head of Customer Success", "Head of Partnerships",
-        "Business Development Manager", "Sales Manager", "Marketing Manager", "Operations Director", "Finance Director",
-        "Strategy Director", "Innovation Director", "Digital Transformation Officer", "E-commerce Director",
-        "Supply Chain Director", "Procurement Manager", "Purchasing Manager", "Logistics Manager",
-        "Quality Assurance Manager", "Project Manager", "Program Manager", "Portfolio Manager",
-        "Investment Manager", "Fund Manager", "Asset Manager", "Wealth Manager", "Relationship Manager",
-        "Branch Manager", "Store Manager", "Retail Manager", "Restaurant Owner", "Franchise Owner",
-        "Real Estate Developer", "Property Manager", "Construction Manager", "Architect", "Engineer",
-        "Healthcare Administrator", "Medical Director", "Practice Manager", "Clinic Owner", "Hospital CEO",
-        "School Principal", "Dean", "University President", "Education Director", "Training Manager",
-        "HR Director", "Talent Acquisition Manager", "Recruitment Manager", "People Operations Manager",
-        "Legal Director", "General Counsel", "Compliance Manager", "Risk Manager", "Audit Manager"
-    ]
-
-    # Expanded locations (200+ cities worldwide)
-    LOCATIONS = [
-        # North America
-        "New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ",
-        "Philadelphia, PA", "San Antonio, TX", "San Diego, CA", "Dallas, TX", "San Jose, CA",
-        "Austin, TX", "Jacksonville, FL", "Fort Worth, TX", "Columbus, OH", "San Francisco, CA",
-        "Charlotte, NC", "Indianapolis, IN", "Seattle, WA", "Denver, CO", "Washington, DC",
-        "Boston, MA", "Nashville, TN", "Detroit, MI", "Portland, OR", "Las Vegas, NV",
-        "Miami, FL", "Atlanta, GA", "Toronto, Canada", "Vancouver, Canada", "Montreal, Canada",
-        "Calgary, Canada", "Ottawa, Canada", "Mexico City, Mexico", "Guadalajara, Mexico",
-
-        # Europe
-        "London, UK", "Paris, France", "Berlin, Germany", "Madrid, Spain", "Rome, Italy",
-        "Amsterdam, Netherlands", "Brussels, Belgium", "Vienna, Austria", "Stockholm, Sweden",
-        "Copenhagen, Denmark", "Oslo, Norway", "Helsinki, Finland", "Dublin, Ireland",
-        "Zurich, Switzerland", "Geneva, Switzerland", "Barcelona, Spain", "Milan, Italy",
-        "Munich, Germany", "Frankfurt, Germany", "Hamburg, Germany", "Warsaw, Poland",
-        "Prague, Czech Republic", "Budapest, Hungary", "Athens, Greece", "Lisbon, Portugal",
-        "Edinburgh, UK", "Manchester, UK", "Birmingham, UK", "Lyon, France", "Marseille, France",
-
-        # Asia
-        "Tokyo, Japan", "Singapore", "Hong Kong", "Seoul, South Korea", "Shanghai, China",
-        "Beijing, China", "Shenzhen, China", "Guangzhou, China", "Mumbai, India", "Delhi, India",
-        "Bangalore, India", "Hyderabad, India", "Chennai, India", "Pune, India", "Kolkata, India",
-        "Bangkok, Thailand", "Jakarta, Indonesia", "Manila, Philippines", "Kuala Lumpur, Malaysia",
-        "Ho Chi Minh City, Vietnam", "Hanoi, Vietnam", "Taipei, Taiwan", "Osaka, Japan",
-        "Dubai, UAE", "Abu Dhabi, UAE", "Riyadh, Saudi Arabia", "Doha, Qatar", "Tel Aviv, Israel",
-
-        # Australia & New Zealand
-        "Sydney, Australia", "Melbourne, Australia", "Brisbane, Australia", "Perth, Australia",
-        "Adelaide, Australia", "Auckland, New Zealand", "Wellington, New Zealand",
-
-        # South America
-        "São Paulo, Brazil", "Rio de Janeiro, Brazil", "Buenos Aires, Argentina", "Santiago, Chile",
-        "Lima, Peru", "Bogotá, Colombia", "Caracas, Venezuela", "Montevideo, Uruguay",
-
-        # Africa
-        "Johannesburg, South Africa", "Cape Town, South Africa", "Cairo, Egypt", "Lagos, Nigeria",
-        "Nairobi, Kenya", "Casablanca, Morocco", "Accra, Ghana", "Addis Ababa, Ethiopia"
-    ]
-
-    # Industries
-    INDUSTRIES = [
-        "Technology", "Software", "SaaS", "E-commerce", "Fintech", "Healthcare", "Biotechnology",
-        "Pharmaceuticals", "Manufacturing", "Retail", "Real Estate", "Construction", "Energy",
-        "Renewable Energy", "Finance", "Banking", "Insurance", "Consulting", "Marketing",
-        "Advertising", "Media", "Entertainment", "Education", "Hospitality", "Food & Beverage",
-        "Transportation", "Logistics", "Automotive", "Aerospace", "Telecommunications",
-        "Legal Services", "Professional Services", "Human Resources", "Recruitment",
-        "Non-profit", "Government", "Agriculture", "Mining", "Oil & Gas", "Utilities"
-    ]
-
-    # Company sizes
-    COMPANY_SIZES = [
-        "1-10 employees", "11-50 employees", "51-200 employees", "201-500 employees",
-        "501-1000 employees", "1001-5000 employees", "5001-10000 employees", "10000+ employees"
-    ]
-
-    # Search form
-    with st.form("lead_search_form"):
-        st.markdown("### 🎯 Define Your Target Audience")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            selected_titles = st.multiselect(
-                "👔 Job Titles",
-                SEARCH_TERMS,
-                default=["CEO", "Founder", "Business Owner"],
-                help="Select one or more job titles to target"
-            )
-
-            selected_locations = st.multiselect(
-                "📍 Locations",
-                LOCATIONS,
-                default=["New York, NY", "San Francisco, CA", "London, UK"],
-                help="Select target locations"
-            )
-
-            selected_industries = st.multiselect(
-                "🏢 Industries",
-                INDUSTRIES,
-                default=["Technology", "Software", "SaaS"],
-                help="Select target industries"
-            )
-
-        with col2:
-            selected_company_sizes = st.multiselect(
-                "📊 Company Size",
-                COMPANY_SIZES,
-                default=["11-50 employees", "51-200 employees"],
-                help="Select target company sizes"
-            )
-
-            num_leads = st.slider(
-                "🎯 Number of Leads",
-                min_value=10,
-                max_value=500,
-                value=50,
-                step=10,
-                help="How many leads do you want to generate?"
-            )
-
-            custom_message = st.text_area(
-                "✉️ Custom Message Template",
-                value="Hi {name}, I noticed your work at {company} and would love to connect!",
-                height=100,
-                help="Use {name} and {company} as placeholders"
-            )
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            search_button = st.form_submit_button("🔍 Search Leads", use_container_width=True)
-
-        with col2:
-            save_search = st.form_submit_button("💾 Save Search", use_container_width=True)
-
-        with col3:
-            load_search = st.form_submit_button("📂 Load Search", use_container_width=True)
-
-    # Handle search submission
-    if search_button:
-        if not selected_titles or not selected_locations:
-            st.error("❌ Please select at least one job title and one location")
-        else:
-            with st.spinner("🔍 Searching for leads... This may take a moment"):
-                # Prepare webhook payload
-                payload = {
-                    'action': 'search_leads',
-                    'job_titles': selected_titles,
-                    'locations': selected_locations,
-                    'industries': selected_industries,
-                    'company_sizes': selected_company_sizes,
-                    'num_leads': num_leads,
-                    'message_template': custom_message
-                }
-
-                # Send to webhook
-                success, response = send_webhook_request(WEBHOOK_URL, payload)
-
-                if success:
-                    st.success(f"✅ Successfully initiated search for {num_leads} leads!")
-                    st.balloons()
-
-                    # Log activity
-                    st.session_state.activity_log.append({
-                        'timestamp': datetime.now(),
-                        'action': 'search_initiated',
-                        'details': f"Searching for {num_leads} leads"
-                    })
-
-                    # Display search summary
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("🎯 Target Leads", num_leads)
-                    with col2:
-                        st.metric("👔 Job Titles", len(selected_titles))
-                    with col3:
-                        st.metric("📍 Locations", len(selected_locations))
-
-                    # Show webhook response
-                    with st.expander("🔍 View Webhook Response"):
-                        st.json(json.loads(response) if response else {})
-                else:
-                    st.error(f"❌ Search failed: {response}")
-
-    if save_search:
-        st.info("💾 Search saved! (Feature in development)")
-
-    if load_search:
-        st.info("📂 Load saved search (Feature in development)")
-
-    # Recent searches
-    st.markdown("<br>### 📜 Recent Activity", unsafe_allow_html=True)
-
-    if st.session_state.activity_log:
-        for activity in reversed(st.session_state.activity_log[-10:]):
-            st.markdown(f"""
-            <div style='background: rgba(255, 255, 255, 0.98); padding: 1.5rem; border-radius: 15px; margin: 0.5rem 0;'>
-                <div style='display: flex; justify-content: space-between; align-items: center;'>
-                    <div>
-                        <strong style='color: #667eea;'>{activity['action'].replace('_', ' ').title()}</strong>
-                        <p style='color: #666; margin: 0.5rem 0 0 0;'>{activity['details']}</p>
-                    </div>
-                    <span style='color: #999; font-size: 0.9rem;'>{activity['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("No recent activity to display")
-
-# TAB 6: CONVERSATIONS (This was TAB 6 in the updates, mapped to TAB 6 here)
-with tab6:
-    st.markdown("## 💬 Conversation History")
-    st.markdown("*Track all your LinkedIn conversations in one place*")
-
-    # Load conversation data from leads
-    if leads_df is not None and not leads_df.empty:
-        # Group conversations
-        st.markdown("### 📊 Conversation Overview")
-
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
-            total_convos = len(leads_df)
-            st.metric("Total Conversations", total_convos)
-
-        with col2:
-            if 'success' in leads_df.columns:
-                successful = leads_df[leads_df['success'] == True].shape[0]
-                st.metric("Successful", successful)
-
-        with col3:
-            if 'connection_status' in leads_df.columns:
-                responded = leads_df[leads_df['connection_status'].notna()].shape[0]
-                st.metric("Responded", responded)
-
-        with col4:
-            if 'timestamp' in leads_df.columns:
-                today_convos = leads_df[leads_df['timestamp'].dt.date == datetime.now().date()]
-                st.metric("Today", len(today_convos))
-
-        st.markdown("---")
-
-        # Display conversations
-        st.markdown("### 💬 Recent Conversations")
-
-        for idx, row in leads_df.head(20).iterrows():
-            profile_name = row.get('profile_name', row.get('name', 'Unknown'))
-            linkedin_url = row.get('linkedin_url', '#')
-            message = row.get('linkedin_message', 'No message')
-            timestamp = row.get('timestamp', 'N/A')
-            status = row.get('connection_status', 'pending')
-
-            st.markdown(f"""
-            <div style='background: rgba(255, 255, 255, 0.98); padding: 2rem; border-radius: 20px;
-                        margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
-                <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;'>
-                    <div>
-                        <h3 style='color: #667eea; margin: 0;'>{profile_name}</h3>
-                        <p style='color: #666; margin: 0.5rem 0;'>{row.get('profile_tagline', row.get('tagline', 'N/A'))}</p>
-                    </div>
-                    <span style='background: #667eea; color: white; padding: 0.5rem 1rem;
-                                border-radius: 20px; font-size: 0.9rem;'>{status}</span>
-                </div>
-                <div style='background: #f8f9fa; padding: 1.5rem; border-radius: 15px;
-                            border-left: 4px solid #667eea; margin: 1rem 0;'>
-                    <p style='color: #2d3748; margin: 0; line-height: 1.6;'>{message}</p>
-                </div>
-                <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;'>
-                    <span style='color: #999; font-size: 0.9rem;'>📅 {timestamp}</span>
-                    <a href="{linkedin_url}" target="_blank"
-                       style='background: #667eea; color: white; padding: 0.5rem 1.5rem;
-                              border-radius: 15px; text-decoration: none;'>View Profile</a>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("💬 No conversations yet. Start your outreach to see conversations here!")
-
-# TAB 7: EMAIL QUEUE (This was TAB 7 in the updates, mapped to TAB 7 here)
-with tab7:
-    st.markdown("## 📧 Email Queue Manager")
-    st.markdown("*Manage and send follow-up emails to your leads*")
-
-    if not st.session_state.email_queue:
-        st.markdown("""
-        <div style='background: rgba(255, 255, 255, 0.95); padding: 4rem; border-radius: 25px;
-                    text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.15);'>
-            <h2 style='color: #667eea; font-size: 3rem; margin-bottom: 1rem;'>📧</h2>
-            <h3 style='color: #2d3748; margin-bottom: 1rem;'>Email Queue is Empty</h3>
-            <p style='color: #666; font-size: 1.1rem;'>Queue emails from the CRM dashboard</p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown(f"""
-        <div style='background: rgba(255, 255, 255, 0.95); padding: 2rem; border-radius: 20px;
-                    text-align: center; margin-bottom: 2rem;'>
-            <h2 style='color: #667eea;'>📧 {len(st.session_state.email_queue)} Queued Emails</h2>
-        </div>
-        """, unsafe_allow_html=True)
-
-        for idx, email in enumerate(st.session_state.email_queue):
-            st.markdown(f"""
-            <div style='background: rgba(255, 255, 255, 0.98); padding: 2rem; border-radius: 20px;
-                        margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
-                <h3 style='color: #667eea;'>To: {email['to']}</h3>
-                <p style='color: #666;'><strong>Subject:</strong> {email['subject']}</p>
-                <div style='background: #f8f9fa; padding: 1.5rem; border-radius: 15px; margin: 1rem 0;'>
-                    {email['body']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                if st.button("✅ Send Now", key=f"send_email_{idx}", use_container_width=True):
-                    st.success(f"✅ Email sent to {email['to']}!")
-                    st.session_state.email_queue.pop(idx)
-                    st.rerun()
-            with col2:
-                if st.button("✏️ Edit", key=f"edit_email_{idx}", use_container_width=True):
-                    st.info("✏️ Edit feature coming soon!")
-            with col3:
-                if st.button("🗑️ Delete", key=f"delete_email_{idx}", use_container_width=True):
-                    st.session_state.email_queue.pop(idx)
-                    st.rerun()
-
-
-# TAB 5: ANALYTICS HUB (This was TAB 5 in the original code, now mapped to TAB 8)
+# TAB 8: ANALYTICS HUB
 with tab8:
     st.markdown("## 📊 Advanced Analytics Hub")
     st.markdown("*Deep insights into your LinkedIn outreach and habit performance*")
@@ -2105,7 +1759,7 @@ with tab8:
             st.metric("Habit Goal", f"{habit_prob:.0f}%")
             st.metric("Overall Success", f"{overall_prob:.0f}%")
 
-# TAB 6: DAILY CHECKLIST (This was TAB 6 in the original code, now mapped to TAB 9)
+# TAB 9: DAILY CHECKLIST
 with tab9:
     st.markdown("## ✅ Daily Outreach & Habit Checklist")
     st.markdown(f"### Day {current_day} of 30 - {datetime.now().strftime('%A, %B %d, %Y')}")
@@ -2242,7 +1896,7 @@ with tab9:
         else:
             st.error("💪 Room to improve!")
 
-# TAB 7: STREAKS & REWARDS (This was TAB 7 in the original code, now mapped to TAB 10)
+# TAB 10: STREAKS & REWARDS
 with tab10:
     st.markdown("## 🔥 Streaks, Achievements & Rewards")
     st.markdown("*Celebrate your consistency and unlock achievements!*")
@@ -2393,209 +2047,7 @@ with tab10:
                  annotation_text="80% Target")
     st.plotly_chart(fig, use_container_width=True)
 
-# TAB 8: TEMPLATES & GUIDE (This was TAB 8 in the original code, now mapped to TAB 11)
-with tab11:
-    st.markdown("## 📖 Complete Strategy Guide & Templates")
-
-    # Message templates
-    st.markdown("### 💬 LinkedIn Message Templates")
-
-    with st.expander("🤝 Connection Request Message", expanded=True):
-        st.code("""Hi [First Name],
-
-I noticed your work in [their industry/role] and thought we should connect. I help businesses implement AI automation systems and would love to share insights.
-
-Looking forward to connecting!
-
-[Your Name]""", language="text")
-
-    with st.expander("💡 Initial Message - AI Systems Checklist Offer"):
-        st.code("""Hi [First Name],
-
-Thanks for connecting! I wanted to reach out because I've put together a free AI Systems Implementation Checklist that's been helping businesses like yours streamline operations and increase efficiency.
-
-Would you be interested in checking it out? It's a quick checklist that covers:
-- AI automation opportunities in your workflow
-- Implementation best practices
-- ROI tracking methods
-- Common pitfalls to avoid
-
-Let me know if you'd like me to send it your way!
-
-Best,
-[Your Name]""", language="text")
-
-    with st.expander("🔗 Link Delivery Message"):
-        st.code("""Hi [First Name],
-
-Great to hear you're interested! Here's the AI Systems Implementation Checklist:
-
-[YOUR LINK HERE]
-
-This covers everything you need to get started with AI automation. Take a look and let me know if you have any questions - happy to chat about how it could work for your specific situation.
-
-Best,
-[Your Name]""", language="text")
-
-    with st.expander("📧 Follow-up Sequence (4 Messages)"):
-        st.markdown("**Follow-up 1 (3 days after link):**")
-        st.code("""Hi [First Name],
-
-Just wanted to check in - did you get a chance to look at the AI Systems Checklist I sent over?
-
-I'd love to hear your thoughts or answer any questions you might have about implementing AI in your workflow.
-
-Best,
-[Your Name]""", language="text")
-
-        st.markdown("**Follow-up 2 (5 days after FU1):**")
-        st.code("""Hi [First Name],
-
-I know things get busy! I wanted to follow up on the AI checklist and see if you had any specific questions about implementation.
-
-I've helped [X number] of businesses in [their industry] implement similar systems - happy to share some specific examples if that would be helpful.
-
-Best,
-[Your Name]""", language="text")
-
-        st.markdown("**Follow-up 3 (7 days after FU2):**")
-        st.code("""Hi [First Name],
-
-Quick question - are you currently working on any AI or automation projects?
-
-I'd love to offer a free 15-minute consultation to discuss how the checklist could be customized for your specific needs. No strings attached, just want to be helpful!
-
-Would you have time for a quick call this week or next?
-
-Best,
-[Your Name]""", language="text")
-
-        st.markdown("**Follow-up 4 - Final Message (7 days after FU3):**")
-        st.code("""Hi [First Name],
-
-I don't want to keep bothering you, so this will be my last message on this topic!
-
-The offer for the free AI consultation is still open if you ever want to discuss how AI systems could help your business. Feel free to reach out anytime.
-
-In the meantime, I'll continue sharing valuable content about AI and automation - hope you find it useful!
-
-Best of luck with everything,
-[Your Name]""", language="text")
-
-    st.markdown("---")
-
-    # Habit building guide
-    st.markdown("### 🏆 Habit Building Strategy")
-
-    with st.expander("📋 How to Build Lasting Habits", expanded=True):
-        st.markdown("""
-        **The 4 Laws of Behavior Change:**
-
-        1. **Make it Obvious**
-           - Set clear triggers and cues
-           - Use implementation intentions: "When X happens, I will do Y"
-           - Design your environment for success
-
-        2. **Make it Attractive**
-           - Pair habits with things you enjoy
-           - Join a group where your desired behavior is normal
-           - Create a motivation ritual
-
-        3. **Make it Easy**
-           - Reduce friction for good habits
-           - Use the 2-minute rule: scale down to 2 minutes
-           - Prepare your environment in advance
-
-        4. **Make it Satisfying**
-           - Use immediate rewards
-           - Track your habits (like in this app!)
-           - Never miss twice in a row
-
-        **Habit Stacking:**
-        - After [CURRENT HABIT], I will [NEW HABIT]
-        - Example: "After I pour my morning coffee, I will send 20 LinkedIn connections"
-        """)
-
-    with st.expander("🎯 Recommended Daily Routine"):
-        st.markdown("""
-        **Morning Routine (60 minutes):**
-        - 🧘 Meditation (10 min)
-        - 📝 Gratitude journal (5 min)
-        - 🔗 LinkedIn outreach - Part 1 (30 min)
-        - 📚 Reading/Learning (15 min)
-
-        **Midday Routine (30 minutes):**
-        - 💪 Exercise/Movement (20 min)
-        - 🔗 LinkedIn follow-ups (10 min)
-
-        **Afternoon Routine (45 minutes):**
-        - 🔗 LinkedIn outreach - Part 2 (30 min)
-        - 📊 Update trackers (10 min)
-        - 📝 Content creation (5 min)
-
-        **Evening Routine (30 minutes):**
-        - 📖 Deep work/Learning (20 min)
-        - 🙏 Reflection & planning (10 min)
-        """)
-
-    with st.expander("💡 Pro Tips for Success"):
-        st.markdown("""
-        **LinkedIn Outreach:**
-        - ✍️ Personalize every message
-        - 📏 Keep it short (300 characters max)
-        - 🎁 Provide value first
-        - ⏰ Wait 24 hours after connection
-        - 📅 Space out follow-ups
-
-        **Habit Tracking:**
-        - 📊 Track daily, no exceptions
-        - 🎯 Focus on consistency over perfection
-        - 🔄 Never miss twice in a row
-        - 🎉 Celebrate small wins
-        - 📈 Review weekly progress
-
-        **Productivity:**
-        - 🌅 Do hardest tasks in the morning
-        - ⏰ Use time blocking
-        - 📱 Minimize distractions
-        - 🎯 Focus on one thing at a time
-        - 💪 Take regular breaks
-        """)
-
-    st.markdown("---")
-
-    # Download templates
-    st.markdown("### 📥 Download Templates")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("#### Daily Tracker Template")
-        sample_daily = create_empty_daily_tracker()
-        csv_sample_daily = io.StringIO()
-        sample_daily.to_csv(csv_sample_daily, index=False)
-        st.download_button(
-            label="📥 Download Daily Tracker Template",
-            data=csv_sample_daily.getvalue(),
-            file_name="daily_tracker_template.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-
-    with col2:
-        st.markdown("#### Habit Log Template")
-        sample_habits = create_empty_habit_log()
-        csv_sample_habits = io.StringIO()
-        sample_habits.to_csv(csv_sample_habits, index=False)
-        st.download_button(
-            label="📥 Download Habit Log Template",
-            data=csv_sample_habits.getvalue(),
-            file_name="habit_log_template.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-
-# TAB 11: WEBHOOK MONITOR (This was TAB 11 in the updates, mapped to TAB 11 here)
+# TAB 11: WEBHOOK MONITOR
 with tab11:
     st.markdown("## 🔗 Webhook Monitor & Testing")
     st.markdown("*Monitor webhook activity and test connections*")
@@ -2676,7 +2128,7 @@ with tab11:
         st.info("No webhook history yet. Send a test request to get started!")
 
 
-# TAB 9: SETTINGS (This was TAB 9 in the original code, now mapped to TAB 12)
+# TAB 12: SETTINGS
 with tab12:
     st.markdown("## ⚙️ Settings & Configuration")
 
