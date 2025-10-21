@@ -409,31 +409,31 @@ with tab1:
     with col1:
         st.markdown('<div class="stage-card">', unsafe_allow_html=True)
         st.markdown("**1️⃣ Sent**")
-        st.metric("", int(total_sent))
+        st.metric("Connections Sent", int(total_sent))
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
         st.markdown('<div class="stage-card">', unsafe_allow_html=True)
         st.markdown("**2️⃣ Accepted**")
-        st.metric("", int(total_accepted))
+        st.metric("Connections Accepted", int(total_accepted))
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col3:
         st.markdown('<div class="stage-card">', unsafe_allow_html=True)
         st.markdown("**3️⃣ Messaged**")
-        st.metric("", int(messages_sent))
+        st.metric("Messages Sent", int(messages_sent))
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col4:
         st.markdown('<div class="stage-card">', unsafe_allow_html=True)
         st.markdown("**4️⃣ Interested**")
-        st.metric("", int(total_interested))
+        st.metric("Interested Responses", int(total_interested))
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col5:
         st.markdown('<div class="stage-card">', unsafe_allow_html=True)
         st.markdown("**5️⃣ Converted**")
-        st.metric("", int(total_conversions))
+        st.metric("Total Conversions", int(total_conversions))
         st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
@@ -539,7 +539,7 @@ with tab2:
     
     st.markdown("---")
     st.markdown("### 📊 Full 30-Day View")
-    st.dataframe(daily_df, use_container_width=True, height=400)
+    st.dataframe(daily_df, width="stretch", height=400)
 
 # TAB 3: LEADS DATABASE
 with tab3:
@@ -578,7 +578,7 @@ with tab3:
     
     if len(st.session_state.leads_database) > 0:
         st.markdown("### Current Leads")
-        st.dataframe(st.session_state.leads_database, use_container_width=True, height=400)
+        st.dataframe(st.session_state.leads_database, width="stretch", height=400)
     else:
         st.info("No leads yet. Add your first lead above!")
 
@@ -591,7 +591,8 @@ with tab4:
     with col1:
         st.markdown("### 📈 Daily Tracker from Sheets")
         if daily_df is not None and not daily_df.empty:
-            st.dataframe(daily_df, use_container_width=True, height=400)
+            st.success(f"✅ Loaded {len(daily_df)} days")
+            st.dataframe(daily_df, width="stretch", height=400)
             
             # Show today's data from sheets
             st.markdown("#### Today's Google Sheets Data")
@@ -606,35 +607,95 @@ with tab4:
             st.warning("No daily tracker data loaded from Google Sheets")
     
     with col2:
-        st.markdown("### 👥 Leads from Sheets")
+        st.markdown("### 👥 Leads Database from Sheets")
+        st.caption(f"Sheet: linkedin-tracking-csv.csv (GID: {LEADS_SHEET_GID})")
+        
         if leads_df is not None and not leads_df.empty:
             st.success(f"✅ Loaded {len(leads_df)} leads")
             
-            # Show column names for debugging
-            with st.expander("📋 Available Columns"):
-                st.write(list(leads_df.columns))
+            # Show column mapping
+            with st.expander("📋 Column Structure"):
+                st.write("**Available Columns:**")
+                for i, col in enumerate(leads_df.columns, 1):
+                    st.caption(f"{i}. {col}")
             
-            # Display sample data
-            st.dataframe(leads_df.head(20), use_container_width=True, height=400)
+            # Key metrics
+            col_a, col_b, col_c = st.columns(3)
             
-            # Success metrics from leads
-            if 'success' in leads_df.columns:
-                successful = leads_df[leads_df['success'] == True]
-                st.metric("Successful Outreach", len(successful))
-                st.metric("Total Leads", len(leads_df))
+            with col_a:
+                total_leads_count = len(leads_df)
+                st.metric("Total Leads", f"{total_leads_count:,}")
             
-            # Show connection status breakdown
+            with col_b:
+                if 'success' in leads_df.columns:
+                    successful_leads = leads_df[leads_df['success'] == True].shape[0]
+                    st.metric("Successful", successful_leads)
+                    if total_leads_count > 0:
+                        st.caption(f"{(successful_leads/total_leads_count*100):.1f}% success rate")
+            
+            with col_c:
+                if 'timestamp' in leads_df.columns:
+                    today_leads = leads_df[leads_df['timestamp'].dt.date == datetime.now().date()].shape[0]
+                    st.metric("Today", today_leads)
+            
+            # Display data with key columns
+            st.markdown("#### Lead Records (First 50)")
+            display_columns = []
+            
+            # Choose most relevant columns to display
+            priority_cols = ['timestamp', 'profile_name', 'name', 'profile_location', 'location', 
+                           'linkedin_url', 'connection_status', 'success', 'search_term']
+            
+            for col in priority_cols:
+                if col in leads_df.columns:
+                    display_columns.append(col)
+            
+            if display_columns:
+                st.dataframe(leads_df[display_columns].head(50), width="stretch", height=400)
+            else:
+                st.dataframe(leads_df.head(50), width="stretch", height=400)
+            
+            # Full data view
+            with st.expander("📊 View All Columns & Data"):
+                st.dataframe(leads_df, width="stretch", height=400)
+            
+            # Connection status breakdown
             if 'connection_status' in leads_df.columns:
+                st.markdown("#### 📊 Connection Status Breakdown")
                 status_counts = leads_df['connection_status'].value_counts()
-                st.markdown("**Connection Status:**")
-                for status, count in status_counts.items():
-                    st.caption(f"• {status}: {count}")
+                
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    fig = px.pie(values=status_counts.values, names=status_counts.index,
+                               title='Connection Status Distribution')
+                    st.plotly_chart(fig, use_container_width=True)
+                with col2:
+                    for status, count in status_counts.items():
+                        st.metric(str(status), count)
+            
+            # Search terms if available
+            if 'search_term' in leads_df.columns:
+                st.markdown("#### 🔍 Search Terms Used")
+                search_counts = leads_df['search_term'].value_counts().head(10)
+                st.bar_chart(search_counts)
         else:
-            st.warning("No leads data loaded from Google Sheets")
-            st.info("Click 'Load Sheets' button to fetch data")
+            st.warning("⚠️ No leads data loaded from Google Sheets")
+            st.info("📌 Click '⬇️ Load Sheets' button in the sidebar to fetch data")
+            
+            # Show what we're trying to load
+            st.markdown("**Attempting to load from:**")
+            st.code(f"Sheet ID: {LEADS_DATABASE_SHEET_ID}\nGID: {LEADS_SHEET_GID}\nSheet Name: linkedin-tracking-csv.csv")
     
     st.markdown("---")
-    st.info("💡 Data auto-refreshes every 60 seconds. Click 'Load Sheets' or 'Refresh' in sidebar for immediate update.")
+    
+    # Data freshness
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info("💡 Data auto-refreshes every 60 seconds. Click 'Load Sheets' or 'Refresh' for immediate update.")
+    with col2:
+        if st.button("🔄 Refresh All Data Now", use_container_width=True, type="primary"):
+            st.cache_data.clear()
+            st.rerun()
 
 # TAB 5: DAILY CHECKLIST
 with tab5:
@@ -748,7 +809,7 @@ with tab6:
                     'Acceptance_Rate': (x['Connections_Accepted'].sum() / x['Connections_Sent'].sum() * 100) if x['Connections_Sent'].sum() > 0 else 0,
                     'Interest_Rate': (x['Interested_Responses'].sum() / x['Connections_Accepted'].sum() * 100) if x['Connections_Accepted'].sum() > 0 else 0,
                     'Conversion_Rate': (x['Conversions'].sum() / x['Interested_Responses'].sum() * 100) if x['Interested_Responses'].sum() > 0 else 0
-                })
+                }), include_groups=False
             ).reset_index()
             
             fig = go.Figure()
