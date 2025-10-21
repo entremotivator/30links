@@ -76,9 +76,22 @@ st.markdown("""
 DAILY_TRACKER_SHEET_ID = "1UkuTf8VwGPIilTxhTEdP9K-zdtZFnThazFdGyxVYfmg"
 LEADS_DATABASE_SHEET_ID = "1eLEFvyV1_f74UC1g5uQ-xA7A62sK8Pog27KIjw_Sk3Y"
 DAILY_TRACKER_SHEET_NAME = "daily_tracker_20251021"
-LEADS_SHEET_NAME = "linkedin-tracking-csv.csv"
+LEADS_SHEET_GID = "1881909623"  # linkedin-tracking-csv.csv sheet
 
-# Function to get sheet data by name
+# Function to get sheet data by GID
+def get_sheet_by_gid(sheet_id, gid):
+    """Get Google Sheet data using GID"""
+    try:
+        url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            df = pd.read_csv(io.StringIO(response.text))
+            return df
+    except Exception as e:
+        st.error(f"Error loading sheet with GID {gid}: {str(e)}")
+    return None
+
+# Function to get sheet data by name (fallback)
 def get_sheet_by_name(sheet_id, sheet_name):
     try:
         url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
@@ -118,16 +131,32 @@ def load_daily_tracker():
 @st.cache_data(ttl=60)
 def load_leads_database():
     try:
-        df = get_sheet_by_name(LEADS_DATABASE_SHEET_ID, LEADS_SHEET_NAME)
+        # Try loading by GID first (for linkedin-tracking-csv.csv sheet)
+        df = get_sheet_by_gid(LEADS_DATABASE_SHEET_ID, LEADS_SHEET_GID)
+        
         if df is not None and not df.empty:
+            # Clean column names
             df.columns = df.columns.str.strip()
+            
+            # Parse success column if it exists
             if 'success' in df.columns:
-                df['success'] = df['success'].astype(str).str.lower() == 'true'
+                df['success'] = df['success'].astype(str).str.lower().isin(['true', 'yes', '1'])
+            
+            # Parse timestamp column if it exists
             if 'timestamp' in df.columns:
                 df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+            
+            # Parse other potential date columns
+            date_columns = [col for col in df.columns if 'date' in col.lower() or 'time' in col.lower()]
+            for col in date_columns:
+                if col != 'timestamp':
+                    df[col] = pd.to_datetime(df[col], errors='coerce')
+            
             return df
+        
         return create_empty_leads_database()
-    except:
+    except Exception as e:
+        st.sidebar.error(f"Error loading leads: {str(e)}")
         return create_empty_leads_database()
 
 # Create empty dataframes
@@ -195,19 +224,33 @@ st.markdown('<div class="linkedin-blue"><h1>🚀 LinkedIn Outreach Tracker Pro</
 # Sidebar
 st.sidebar.header("☁️ Google Sheets Sync")
 
+# Debug info
+with st.sidebar.expander("🔍 Connection Info", expanded=False):
+    st.caption(f"**Daily Tracker ID:** {DAILY_TRACKER_SHEET_ID}")
+    st.caption(f"**Sheet Name:** {DAILY_TRACKER_SHEET_NAME}")
+    st.caption(f"**Leads DB ID:** {LEADS_DATABASE_SHEET_ID}")
+    st.caption(f"**Leads Sheet GID:** {LEADS_SHEET_GID}")
+
 # Sync status
 col1, col2 = st.sidebar.columns(2)
 with col1:
     if st.button("⬇️ Load Sheets", use_container_width=True):
         st.cache_data.clear()
-        daily_data = load_daily_tracker()
-        leads_data = load_leads_database()
-        if daily_data is not None:
-            st.session_state.sheets_data = daily_data
-            st.sidebar.success("✅ Daily tracker loaded!")
-        if leads_data is not None:
-            st.session_state.leads_sheets_data = leads_data
-            st.sidebar.success("✅ Leads data loaded!")
+        with st.spinner("Loading data..."):
+            daily_data = load_daily_tracker()
+            leads_data = load_leads_database()
+            
+            if daily_data is not None and not daily_data.empty:
+                st.session_state.sheets_data = daily_data
+                st.sidebar.success(f"✅ Daily: {len(daily_data)} rows")
+            else:
+                st.sidebar.warning("⚠️ No daily tracker data")
+                
+            if leads_data is not None and not leads_data.empty:
+                st.session_state.leads_sheets_data = leads_data
+                st.sidebar.success(f"✅ Leads: {len(leads_data)} rows")
+            else:
+                st.sidebar.warning("⚠️ No leads data")
         st.rerun()
 
 with col2:
@@ -218,7 +261,9 @@ with col2:
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🔗 Quick Links")
 st.sidebar.markdown(f"[📈 Daily Tracker Sheet](https://docs.google.com/spreadsheets/d/{DAILY_TRACKER_SHEET_ID}/edit)")
-st.sidebar.markdown(f"[👥 Leads Database Sheet](https://docs.google.com/spreadsheets/d/{LEADS_DATABASE_SHEET_ID}/edit)")
+st.sidebar.markdown(f"[👥 Leads Database Sheet](https://docs.google.com/spreadsheets/d/{LEADS_DATABASE_SHEET_ID}/edit?gid={LEADS_SHEET_GID})")
+st.sidebar.markdown("---")
+st.sidebar.info("💡 Make sure sheets are set to 'Anyone with link can view'")
 
 # Load data
 daily_df = st.session_state.sheets_data if st.session_state.sheets_data is not None else st.session_state.daily_tracker
@@ -550,6 +595,13 @@ with tab4:
     with col2:
         st.markdown("### 👥 Leads from Sheets")
         if leads_df is not None and not leads_df.empty:
+            st.success(f"✅ Loaded {len(leads_df)} leads")
+            
+            # Show column names for debugging
+            with st.expander("📋 Available Columns"):
+                st.write(list(leads_df.columns))
+            
+            # Display sample data
             st.dataframe(leads_df.head(20), use_container_width=True, height=400)
             
             # Success metrics from leads
@@ -557,8 +609,16 @@ with tab4:
                 successful = leads_df[leads_df['success'] == True]
                 st.metric("Successful Outreach", len(successful))
                 st.metric("Total Leads", len(leads_df))
+            
+            # Show connection status breakdown
+            if 'connection_status' in leads_df.columns:
+                status_counts = leads_df['connection_status'].value_counts()
+                st.markdown("**Connection Status:**")
+                for status, count in status_counts.items():
+                    st.caption(f"• {status}: {count}")
         else:
             st.warning("No leads data loaded from Google Sheets")
+            st.info("Click 'Load Sheets' button to fetch data")
     
     st.markdown("---")
     st.info("💡 Data auto-refreshes every 60 seconds. Click 'Load Sheets' or 'Refresh' in sidebar for immediate update.")
