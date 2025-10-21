@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import gspread
@@ -332,88 +331,39 @@ st.markdown("""
         color: white !important;
     }
     
-    .status-error { 
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    .status-converted {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         color: white !important;
     }
     
-    /* Section Headers */
-    .section-header {
-        font-size: 2.5rem; 
-        font-weight: 800; 
-        color: #ffffff; 
-        margin: 3rem 0 2rem 0;
-        padding-bottom: 1.5rem; 
-        border-bottom: 4px solid rgba(255, 255, 255, 0.3);
-        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        position: relative;
-        animation: slideInLeft 0.6s ease-out;
+    .status-replied {
+        background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+        color: white !important;
     }
     
-    @keyframes slideInLeft {
-        from { transform: translateX(-50px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    /* Stat Boxes */
-    .stat-box {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        border-top: 4px solid #667eea;
-        transition: all 0.3s ease;
-    }
-    
-    .stat-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 900;
-        color: #667eea;
-        margin: 0.5rem 0;
-    }
-    
-    .stat-label {
-        font-size: 0.95rem;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 600;
-    }
-    
-    /* Streamlit overrides */
+    /* Streamlit Overrides */
     .stButton>button {
-        background-color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border-radius: 15px;
         border: none;
-        padding: 10px 20px;
-        font-weight: 600;
+        border-radius: 12px;
+        padding: 0.8rem 1.5rem;
+        font-weight: 700;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
     
     .stButton>button:hover {
-        background-color: #764ba2;
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(118, 75, 162, 0.4);
     }
     
-    .stTextInput>div>div>input, .stSelectbox>div>div>select, .stTextArea>div>div>textarea, .stFileUploader>div>div>button {
-        border-radius: 15px;
-        border: 1px solid #e0e0e0;
-        padding: 10px 15px;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-    }
-    
-    .stTextInput>div>div>input:focus, .stSelectbox>div>div>select:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    .stTextInput>div>div>input, .stSelectbox>div>div, .stDateInput>div>div, .stTextArea>div>div>textarea {
+        border-radius: 12px;
+        border: 2px solid #ccc;
+        padding: 0.5rem 1rem;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     }
     
     .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
@@ -422,202 +372,358 @@ st.markdown("""
     }
     
     .stTabs [data-baseweb="tab-list"] {
-        gap: 20px;
-        justify-content: center;
+        gap: 1.5rem;
     }
     
-    .stTabs [data-baseweb="tab-list"] button {
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 12px 12px 0 0;
         background: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
-        padding: 1rem 2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: #333;
         transition: all 0.3s ease;
+        padding: 0.5rem 1.5rem;
     }
     
-    .stTabs [data-baseweb="tab-list"] button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-    
-    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background: #667eea;
         color: white;
-        border-color: #667eea;
+        border-bottom: none;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
     }
     
-    .streamlit-expanderHeader {
-        background: rgba(255, 255, 255, 0.9);
-        color: #667eea;
-        border-radius: 15px;
-        font-weight: 700;
-        padding: 1rem 1.5rem;
-        border: 2px solid rgba(102, 126, 234, 0.2);
-        transition: all 0.3s ease;
+    /* Sidebar */
+    .css-1d391kg {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    .streamlit-expanderHeader:hover {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-        transform: translateX(5px);
+    .css-1d391kg .stButton>button {
+        background: #f0f2f6;
+        color: #333;
+        box-shadow: none;
+        border: 1px solid #ddd;
     }
     
-    /* Loading Animation */
-    .stSpinner > div {
-        border-color: #667eea transparent transparent transparent !important;
+    .css-1d391kg .stButton>button:hover {
+        background: #e0e2e6;
+        transform: none;
     }
     
-    /* Success/Error Messages */
-    .stSuccess, .stError, .stWarning, .stInfo {
-        background: rgba(255, 255, 255, 0.95) !important;
+    /* Toast/Notification */
+    .st-emotion-cache-1c7v05j { /* Targeting the toast container */
+        background-color: #667eea !important;
+        color: white !important;
         border-radius: 15px !important;
-        padding: 1.5rem !important;
-        border-left-width: 6px !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-        animation: slideIn 0.5s ease-out !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
     
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-        width: 12px;
-        height: 12px;
+    .st-emotion-cache-1c7v05j * {
+        color: white !important;
     }
     
-    ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
+    /* Chart Containers */
+    .stPlotlyChart {
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     
-    ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
+    /* Custom Icon Styles */
+    .icon-large {
+        font-size: 2rem;
+        margin-right: 0.5rem;
+        color: #667eea;
     }
     
-    ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    }
-    
-    /* Action Buttons Container */
-    .action-buttons {
+    /* Custom Card Header */
+    .card-header {
         display: flex;
-        gap: 12px;
-        margin-top: 1.5rem;
-        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
     }
     
-    .action-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 15px;
+    .card-header h3 {
+        font-size: 1.5rem;
         font-weight: 700;
-        text-decoration: none;
+        color: #333;
+        margin: 0;
+    }
+    
+    /* Habit Tracker Styles */
+    .habit-card {
+        border-left: 6px solid #10b981;
+    }
+    
+    .habit-card:hover {
+        border-left-width: 8px;
+    }
+    
+    .habit-title {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .habit-day-checked {
+        background-color: #10b981;
+        color: white;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        justify-content: center;
+        font-weight: 700;
+        margin: 5px;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
     }
     
-    .action-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        border-color: white;
+    .habit-day-unchecked {
+        background-color: #f0f0f0;
+        color: #333;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        margin: 5px;
+        border: 1px solid #ddd;
     }
     
-    /* Stats Grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin: 2rem 0;
+    .stProgress > div > div > div > div {
+        background-color: #10b981;
     }
     
-    /* Filter Panel */
-    .filter-panel {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        padding: 2rem;
-        border-radius: 25px;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-    }
-    
-    /* Tag Badge */
-    .tag-badge {
-        display: inline-block;
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        margin: 0.2rem;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-        color: #667eea;
-        border: 1px solid rgba(102, 126, 234, 0.3);
-    }
-    
-    /* Note Card */
-    .note-card {
-        background: #fff9e6;
-        border-left: 4px solid #f59e0b;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-        font-style: italic;
-        color: #666;
-    }
 </style>
 """, unsafe_allow_html=True)
 
-# ==================== HELPER FUNCTIONS ==================== #
-@st.cache_resource
-def init_google_sheets(credentials_json):
-    """Initialize Google Sheets client with service account credentials"""
-    try:
-        credentials_dict = json.loads(credentials_json)
-        scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-        credentials = Credentials.from_service_account_info(credentials_dict, scopes=scopes)
-        return gspread.authorize(credentials)
-    except Exception as e:
-        st.error(f"🔴 Authentication Error: {str(e)}")
-        return None
+# ==================== UTILITY FUNCTIONS ==================== #
 
-@st.cache_data(ttl=60)
-def load_sheet_data(_client, sheet_id, sheet_name):
-    """Load data from Google Sheets with caching"""
-    try:
-        spreadsheet = _client.open_by_key(sheet_id)
+def get_gsheets_client():
+    """Initializes and returns the gspread client."""
+    if st.session_state.gsheets_client is None:
         try:
-            worksheet = spreadsheet.worksheet(sheet_name)
-        except gspread.exceptions.WorksheetNotFound:
-            # If sheet_name is actually a CSV file name, try to find a sheet with a similar name or the first sheet
-            st.warning(f"Worksheet '{sheet_name}' not found. Attempting to load the first worksheet.")
-            worksheet = spreadsheet.sheet1
+            # Use st.secrets for credentials
+            creds_json = st.secrets["gcp_service_account"]
+            
+            # Define the scope
+            scope = ['https://spreadsheets.google.com/feeds',
+                     'https://www.googleapis.com/auth/drive']
+            
+            # Create credentials object
+            creds = Credentials.from_service_account_info(creds_json, scopes=scope)
+            
+            # Authorize the client
+            client = gspread.authorize(creds)
+            st.session_state.gsheets_client = client
+            st.session_state.authenticated = True
+            st.toast("✅ Google Sheets client authenticated successfully!", icon="🔑")
+            return client
+        except Exception as e:
+            st.error(f"Authentication Error: {e}")
+            st.session_state.authenticated = False
+            return None
+    return st.session_state.gsheets_client
 
+def load_data_from_gsheets(spreadsheet_id, sheet_name, use_cache=True):
+    """Loads data from a Google Sheet into a pandas DataFrame."""
+    client = get_gsheets_client()
+    if client is None:
+        return pd.DataFrame()
+    
+    # Simple caching mechanism
+    if use_cache and (spreadsheet_id, sheet_name) in st.session_state.sheets_data:
+        return st.session_state.sheets_data[(spreadsheet_id, sheet_name)]
+
+    try:
+        spreadsheet = client.open_by_key(spreadsheet_id)
+        worksheet = spreadsheet.worksheet(sheet_name)
         data = worksheet.get_all_records()
-        return pd.DataFrame(data)
+        df = pd.DataFrame(data)
+        
+        # Store in cache
+        if st.session_state.sheets_data is None:
+            st.session_state.sheets_data = {}
+        st.session_state.sheets_data[(spreadsheet_id, sheet_name)] = df
+        
+        return df
+    except gspread.exceptions.SpreadsheetNotFound:
+        st.error(f"Spreadsheet with ID '{spreadsheet_id}' not found.")
+    except gspread.exceptions.WorksheetNotFound:
+        st.error(f"Worksheet '{sheet_name}' not found in spreadsheet ID '{spreadsheet_id}'.")
     except Exception as e:
-        st.error(f"🔴 Data Loading Error: {str(e)}")
+        st.error(f"An error occurred while loading data: {e}")
+    
+    return pd.DataFrame()
+
+def load_leads_data(spreadsheet_id, sheet_gid, use_cache=True):
+    """Loads leads data from a Google Sheet using the GID for CSV export."""
+    client = get_gsheets_client()
+    if client is None:
         return pd.DataFrame()
 
+    # Simple caching mechanism
+    if use_cache and (spreadsheet_id, sheet_gid) in st.session_state.leads_sheets_data:
+        return st.session_state.leads_sheets_data[(spreadsheet_id, sheet_gid)]
+
+    try:
+        # Construct the export URL for the specific sheet (GID) as CSV
+        export_url = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid={sheet_gid}"
+        
+        # Use gspread to get the spreadsheet title for logging/error messages
+        spreadsheet = client.open_by_key(spreadsheet_id)
+        
+        # Use requests to download the CSV content
+        response = requests.get(export_url)
+        response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
+        
+        # Read the CSV content directly into a pandas DataFrame
+        df = pd.read_csv(BytesIO(response.content))
+        
+        # Store in cache
+        if st.session_state.leads_sheets_data is None:
+            st.session_state.leads_sheets_data = {}
+        st.session_state.leads_sheets_data[(spreadsheet_id, sheet_gid)] = df
+
+        return df
+    except gspread.exceptions.SpreadsheetNotFound:
+        st.error(f"Leads Spreadsheet with ID '{spreadsheet_id}' not found.")
+    except requests.exceptions.RequestException as e:
+        st.error(f"Network or download error for leads data: {e}")
+    except Exception as e:
+        st.error(f"An error occurred while loading leads data: {e}")
+    
+    return pd.DataFrame()
+
+def save_data_to_gsheets(df, spreadsheet_id, sheet_name):
+    """Saves a pandas DataFrame to a Google Sheet."""
+    client = get_gsheets_client()
+    if client is None:
+        return False
+    
+    try:
+        spreadsheet = client.open_by_key(spreadsheet_id)
+        worksheet = spreadsheet.worksheet(sheet_name)
+        
+        # Clear existing data and write new data including headers
+        worksheet.clear()
+        worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+        st.toast(f"✅ Data saved successfully to {sheet_name}!", icon="💾")
+        return True
+    except gspread.exceptions.SpreadsheetNotFound:
+        st.error(f"Spreadsheet with ID '{spreadsheet_id}' not found for saving.")
+    except gspread.exceptions.WorksheetNotFound:
+        st.error(f"Worksheet '{sheet_name}' not found for saving.")
+    except Exception as e:
+        st.error(f"An error occurred while saving data: {e}")
+    
+    return False
+
+def add_log_entry(message):
+    """Adds a message to the activity log and displays a toast notification."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] {message}"
+    st.session_state.activity_log.append(log_entry)
+    if st.session_state.show_notifications:
+        st.toast(message, icon="🔔")
+
+def get_profile_initials(name):
+    """Generates initials from a name for the profile badge."""
+    return "".join(word[0].upper() for word in name.split() if word).ljust(2, ' ')[0:2]
+
+def get_status_badge(status):
+    """Returns the HTML for a styled status badge."""
+    status_map = {
+        "Connected": ("status-success", "🤝"),
+        "Sent": ("status-sent", "✉️"),
+        "Pending": ("status-pending", "⏳"),
+        "Replied": ("status-replied", "💬"),
+        "Converted": ("status-converted", "💰"),
+        "Ready": ("status-ready", "✅")
+    }
+    
+    css_class, icon = status_map.get(status, ("status-pending", "❓"))
+    
+    return f"""
+    <div class="{css_class} status-badge">
+        {icon} {status}
+    </div>
+    """
+
+def get_message_history(df, contact_url):
+    """Filters the chat DataFrame for a specific contact and formats the history."""
+    history_df = df[df['Contact_URL'] == contact_url].sort_values(by='Timestamp', ascending=True)
+    
+    history_html = ""
+    for index, row in history_df.iterrows():
+        sender = row['Sender_Name']
+        message = row['Message_Content']
+        timestamp = row['Timestamp']
+        
+        # Determine if the message is from 'Me' (the user's profile)
+        is_me = sender == MY_PROFILE["name"]
+        
+        # Simple markdown to HTML conversion for messages
+        message_html = message.replace('\n', '<br>')
+        
+        # Style the message based on sender
+        if is_me:
+            # Outgoing message (Blue/Purple)
+            style = """
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white !important;
+                border-radius: 20px 20px 5px 20px;
+                align-self: flex-end;
+                text-align: right;
+            """
+            sender_name = "You"
+        else:
+            # Incoming message (Light Gray)
+            style = """
+                background: #f0f2f6;
+                color: #333 !important;
+                border-radius: 20px 20px 20px 5px;
+                align-self: flex-start;
+                text-align: left;
+            """
+            sender_name = sender
+            
+        history_html += f"""
+        <div style="display: flex; justify-content: {'flex-end' if is_me else 'flex-start'}; margin-bottom: 1rem;">
+            <div style="max-width: 70%; padding: 1rem 1.5rem; {style} box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <small style="opacity: 0.8; font-size: 0.75rem; color: {'#ddd' if is_me else '#666'} !important;">{sender_name} - {timestamp}</small>
+                <p style="margin: 0; font-size: 0.95rem; line-height: 1.4; color: {'white' if is_me else '#333'} !important;">{message_html}</p>
+            </div>
+        </div>
+        """
+    
+    if not history_html:
+        return "<p style='text-align: center; color: #999;'>No message history found for this contact.</p>"
+        
+    return history_html
+
 @st.cache_data(ttl=60)
-def load_daily_tracker():
-    """Load daily tracker data from Google Sheets"""
-    client = st.session_state.gsheets_client
+def load_daily_tracker_data(client):
+    """Loads and processes the daily activity tracker data."""
     if client:
         try:
             spreadsheet = client.open_by_key(DAILY_TRACKER_SHEET_ID)
             try:
                 worksheet = spreadsheet.worksheet(DAILY_TRACKER_SHEET_NAME)
             except gspread.exceptions.WorksheetNotFound:
-                st.warning(f"Daily tracker worksheet \'{DAILY_TRACKER_SHEET_NAME}\' not found. Attempting to load the first worksheet.")
+                st.warning(f"Daily tracker worksheet '{DAILY_TRACKER_SHEET_NAME}' not found. Attempting to load the first worksheet.")
                 worksheet = spreadsheet.sheet1 # Fallback to the first sheet
 
             data = worksheet.get_all_records()
             df = pd.DataFrame(data)
             # Ensure numeric types for calculations
-            for col in [\'Connections_Sent\', \'Messages_Sent\', \'Follow_ups_Sent\', \'Responses_Received\', \'Leads_Converted\']:
+            for col in ['Connections_Sent', 'Messages_Sent', 'Follow_ups_Sent', 'Responses_Received', 'Leads_Converted']:
                 if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors=\'coerce\').fillna(0).astype(int)
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
             
             # Ensure 'Date' column is in datetime format for filtering
             if 'Date' in df.columns:
@@ -628,1206 +734,815 @@ def load_daily_tracker():
     return pd.DataFrame()
 
 @st.cache_data(ttl=60)
-def load_leads_database():
-    """Load leads database from Google Sheets (CRM data)"""
-    client = st.session_state.gsheets_client
-    if client:
-        try:
-            spreadsheet = client.open_by_key(OUTREACH_SPREADSHEET_ID)
-            worksheet = spreadsheet.worksheet(OUTREACH_SHEET_NAME)
-            data = worksheet.get_all_records()
-            df = pd.DataFrame(data)
-            # Convert 'timestamp' column to datetime objects
-            if 'timestamp' in df.columns:
-                df['parsed_time'] = df['timestamp'].apply(parse_timestamp)
-            else:
-                df['parsed_time'] = pd.NaT # Add NaT if timestamp column is missing
-            return df
-        except Exception as e:
-            st.error(f"🔴 Error loading leads database (CRM): {e}")
-    return pd.DataFrame()
+def get_daily_summary(df):
+    """Calculates summary statistics from the daily tracker data."""
+    if df.empty:
+        return {}
+    
+    # Calculate totals
+    total_connections = df['Connections_Sent'].sum()
+    total_messages = df['Messages_Sent'].sum()
+    total_followups = df['Follow_ups_Sent'].sum()
+    total_responses = df['Responses_Received'].sum()
+    total_leads = df['Leads_Converted'].sum()
+    
+    # Calculate averages
+    days_tracked = df.shape[0]
+    avg_connections = total_connections / days_tracked if days_tracked > 0 else 0
+    avg_messages = total_messages / days_tracked if days_tracked > 0 else 0
+    
+    # Calculate conversion rate
+    total_outreach = total_connections + total_messages + total_followups
+    conversion_rate = (total_leads / total_outreach) * 100 if total_outreach > 0 else 0
+    response_rate = (total_responses / total_outreach) * 100 if total_outreach > 0 else 0
+    
+    # Get last 7 days data
+    last_7_days = df.tail(7)
+    last_7_connections = last_7_days['Connections_Sent'].sum()
+    last_7_leads = last_7_days['Leads_Converted'].sum()
+    
+    return {
+        "total_connections": total_connections,
+        "total_messages": total_messages,
+        "total_followups": total_followups,
+        "total_responses": total_responses,
+        "total_leads": total_leads,
+        "days_tracked": days_tracked,
+        "avg_connections": avg_connections,
+        "avg_messages": avg_messages,
+        "conversion_rate": conversion_rate,
+        "response_rate": response_rate,
+        "last_7_connections": last_7_connections,
+        "last_7_leads": last_7_leads,
+        "df": df
+    }
 
-def parse_timestamp(timestamp_str):
-    """Parse various timestamp formats"""
-    if pd.isna(timestamp_str) or timestamp_str == '':
-        return None
+def get_daily_goal_progress(df, goals):
+    """Calculates the progress towards daily goals."""
+    if df.empty:
+        return {}
+    
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    today_data = df[df['Date'] == today_date]
+    
+    progress = {}
+    
+    for goal_name, goal_value in goals.items():
+        current_value = today_data[goal_name].iloc[0] if not today_data.empty and goal_name in today_data.columns else 0
+        
+        # Calculate percentage
+        percent = (current_value / goal_value) * 100 if goal_value > 0 else 0
+        percent = min(percent, 100) # Cap at 100%
+        
+        progress[goal_name] = {
+            "current": current_value,
+            "goal": goal_value,
+            "percent": percent
+        }
+        
+    return progress
+
+# ==================== WEBHOOK & CRM FUNCTIONS ==================== #
+
+def send_webhook_payload(payload):
+    """Sends a payload to the external webhook URL."""
     try:
-        return pd.to_datetime(timestamp_str, format='%m/%d/%Y %H:%M:%S')
-    except ValueError:
-        try:
-            return pd.to_datetime(timestamp_str)
-        except:
-            return None
-
-def is_message_sent(row):
-    """Check if a message has been sent"""
-    if row.get("email_subject") or row.get("email_message"):
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(WEBHOOK_URL, data=json.dumps(payload), headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        # Log the successful webhook
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = {
+            "timestamp": timestamp,
+            "status": "Success",
+            "payload_hash": hashlib.sha256(json.dumps(payload).encode('utf-8')).hexdigest()[:8],
+            "response_status": response.status_code,
+            "response_text": response.text[:100] # Truncate response for log
+        }
+        st.session_state.webhook_history.append(log_entry)
+        add_log_entry(f"Webhook sent successfully! Status: {response.status_code}")
+        return True
+    except requests.exceptions.RequestException as e:
+        error_message = f"Webhook failed: {e}"
+        st.error(error_message)
+        
+        # Log the failed webhook
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = {
+            "timestamp": timestamp,
+            "status": "Failed",
+            "payload_hash": hashlib.sha256(json.dumps(payload).encode('utf-8')).hexdigest()[:8],
+            "response_status": getattr(e.response, 'status_code', 'N/A'),
+            "response_text": str(e)
+        }
+        st.session_state.webhook_history.append(log_entry)
+        add_log_entry(error_message)
         return False
-    success = str(row.get('success', '')).lower()
-    return success == 'true' or success == 'yes' or success == '1'
 
-def is_me(sender_name, sender_url, my_profile):
-    """Check if the sender is the current user"""
-    if not sender_name or not isinstance(sender_name, str):
+def create_lead_payload(row):
+    """Creates a standard lead payload from a DataFrame row."""
+    # Ensure all keys exist in the payload, even if values are empty
+    payload = {
+        "Contact_Name": row.get('Contact_Name', ''),
+        "Contact_URL": row.get('Contact_URL', ''),
+        "Status": row.get('Status', 'Pending'),
+        "Last_Message_Date": row.get('Last_Message_Date', datetime.now().strftime("%Y-%m-%d")),
+        "Company": row.get('Company', ''),
+        "Title": row.get('Title', ''),
+        "Location": row.get('Location', ''),
+        "Email": row.get('Email', ''),
+        "Phone": row.get('Phone', ''),
+        "Notes": st.session_state.notes.get(row.get('Contact_URL', ''), ''),
+        "Tags": ", ".join(st.session_state.tags.get(row.get('Contact_URL', ''), [])),
+        "Source": "LinkedIn CRM App"
+    }
+    return payload
+
+def update_lead_status(contact_url, new_status):
+    """Updates the status of a lead in the leads database and sends a webhook."""
+    
+    # 1. Update the local leads_database DataFrame
+    df = st.session_state.leads_database.copy()
+    if 'Contact_URL' in df.columns:
+        # Find the row index for the contact
+        idx = df[df['Contact_URL'] == contact_url].index
+        
+        if not idx.empty:
+            # Update the status
+            df.loc[idx, 'Status'] = new_status
+            
+            # Update the local session state
+            st.session_state.leads_database = df
+            
+            # 2. Prepare and send the webhook payload
+            lead_row = df.loc[idx].iloc[0]
+            payload = create_lead_payload(lead_row)
+            payload['Status'] = new_status # Ensure the new status is in the payload
+            send_webhook_payload(payload)
+            
+            # 3. Save the updated DataFrame back to Google Sheets (optional, can be done less frequently)
+            # save_data_to_gsheets(df, LEADS_DATABASE_SHEET_ID, LEADS_SHEET_NAME) 
+            
+            add_log_entry(f"Status for {lead_row.get('Contact_Name', 'Lead')} updated to {new_status}")
+            return True
+        else:
+            st.warning(f"Could not find lead with URL: {contact_url}")
+            return False
+    else:
+        st.error("Leads database is missing 'Contact_URL' column.")
         return False
-    return (my_profile["name"].lower() in sender_name.lower() or
-            (sender_url and my_profile["url"].lower() in str(sender_url).lower()))
 
-def get_initials(name):
-    """Get initials from a name"""
-    if not name:
-        return "?"
-    parts = name.split()
-    return f"{parts[0][0]}{parts[1][0]}".upper() if len(parts) >= 2 else name[0].upper()
+# ==================== DATA PROCESSING & VISUALIZATION ==================== #
 
-def send_webhook_request(webhook_url, payload):
-    """Send data to webhook endpoint"""
-    try:
-        response = requests.post(webhook_url, json=payload, timeout=10)
-        return response.status_code == 200, response.text
-    except Exception as e:
-        return False, str(e)
-
-def generate_lead_id(profile_name, linkedin_url):
-    """Generate unique lead ID"""
-    unique_string = f"{profile_name}_{linkedin_url}_{datetime.now().isoformat()}"
-    return hashlib.md5(unique_string.encode()).hexdigest()[:12]
-
-def export_to_csv(df, filename="export.csv"):
-    """Export dataframe to CSV"""
-    return df.to_csv(index=False).encode('utf-8')
-
-def create_pdf_report(data_dict):
-    """Create a PDF report from data dictionary"""
-    # This is a placeholder - implement with reportlab or similar
-    return b"PDF Report Content"
-
-def filter_dataframe(df, filters):
-    """Apply filters to dataframe"""
-    filtered_df = df.copy()
+def process_outreach_data(df):
+    """Cleans and processes the outreach tracking data."""
+    if df.empty:
+        return df
     
-    if filters.get('status') and filters['status'] != 'all':
-        if 'status' in filtered_df.columns:
-            filtered_df = filtered_df[filtered_df['status'] == filters['status']]
+    # Rename columns for consistency (if necessary, based on the actual CSV structure)
+    df.columns = df.columns.str.replace('[^A-Za-z0-9_]+', '', regex=True)
     
-    if filters.get('date_range'):
-        days = filters['date_range']
-        cutoff_date = datetime.now() - timedelta(days=days)
-        if 'parsed_time' in filtered_df.columns:
-            filtered_df = filtered_df[filtered_df['parsed_time'] >= cutoff_date]
+    # Convert 'Date' column to datetime
+    if 'Date' in df.columns:
+        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+        df.dropna(subset=['Date'], inplace=True)
+        df['Date'] = df['Date'].dt.date # Keep only the date part
     
-    if filters.get('search_query'):
-        query = filters['search_query'].lower()
-        mask = filtered_df.apply(lambda row: any(
-            query in str(val).lower() for val in row.values
-        ), axis=1)
-        filtered_df = filtered_df[mask]
+    # Standardize column names for tracking metrics (assuming these exist)
+    # This is a placeholder and should be adjusted based on the actual CSV columns
+    required_cols = ['Contact_Name', 'Contact_URL', 'Status', 'Last_Message_Date']
+    for col in required_cols:
+        if col not in df.columns:
+            df[col] = ''
+            
+    # Clean up status column (e.g., if it contains extra text)
+    if 'Status' in df.columns:
+        df['Status'] = df['Status'].astype(str).str.strip()
     
-    return filtered_df
+    return df
 
-def calculate_metrics(chat_df, outreach_df, daily_tracker_df):
-    """Calculate comprehensive metrics"""
-    metrics = {
-        'total_conversations': len(chat_df),
-        'total_leads': len(outreach_df),
-        'messages_sent': 0,
-        'messages_received': 0,
-        'response_rate': 0,
-        'avg_response_time': 0,
-        'pending_leads': 0,
-        'ready_to_send': 0,
-        'conversion_rate': 0,
-        'connections_sent_today': 0,
-        'messages_sent_today': 0,
-        'follow_ups_sent_today': 0,
-        'responses_received_today': 0,
-        'leads_converted_today': 0
+def process_chat_data(df):
+    """Cleans and processes the chat history data."""
+    if df.empty:
+        return df
+    
+    # Rename columns for consistency
+    df.columns = df.columns.str.replace('[^A-Za-z0-9_]+', '', regex=True)
+    
+    # Convert 'Timestamp' to datetime
+    if 'Timestamp' in df.columns:
+        df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
+        df.dropna(subset=['Timestamp'], inplace=True)
+        
+    # Standardize 'Sender_Name'
+    if 'Sender_Name' in df.columns:
+        df['Sender_Name'] = df['Sender_Name'].astype(str).str.strip()
+        
+    return df
+
+def create_status_pie_chart(df):
+    """Creates a Plotly pie chart for lead status distribution."""
+    if df.empty:
+        return go.Figure()
+        
+    status_counts = df['Status'].value_counts().reset_index()
+    status_counts.columns = ['Status', 'Count']
+    
+    # Define a color map for statuses
+    color_map = {
+        'Connected': '#10b981', # Green
+        'Sent': '#3b82f6',      # Blue
+        'Pending': '#f59e0b',   # Yellow/Orange
+        'Replied': '#ec4899',   # Pink
+        'Converted': '#8b5cf6', # Purple
+        'Ready': '#22c55e'      # Light Green
     }
     
-    if not chat_df.empty:
-        # Ensure 'timestamp' column exists before processing
-        if 'timestamp' not in chat_df.columns:
-            chat_df['timestamp'] = pd.NaT # Add a NaT column if missing
-
-        is_my_message = chat_df.apply(
-            lambda row: is_me(row.get('sender_name'), row.get('sender_url'), MY_PROFILE), axis=1
-        ).astype(bool)
-        metrics['messages_sent'] = len(chat_df[is_my_message])
-        metrics['messages_received'] = len(chat_df) - metrics['messages_sent']
-        
-        if metrics['messages_sent'] > 0:
-            metrics['response_rate'] = round((metrics['messages_received'] / metrics['messages_sent']) * 100, 2)
-
-    if not outreach_df.empty:
-        if 'status' in outreach_df.columns:
-            metrics['pending_leads'] = len(outreach_df[outreach_df['status'] == 'pending'])
-            metrics['ready_to_send'] = len(outreach_df[outreach_df['status'] == 'ready_to_send'])
-        
-        if 'success' in outreach_df.columns:
-            sent_count = len(outreach_df[outreach_df['success'].astype(str).str.lower() == 'true'])
-            if metrics['total_leads'] > 0:
-                metrics['conversion_rate'] = round((sent_count / metrics['total_leads']) * 100, 2)
-
-    if not daily_tracker_df.empty:
-        today_str = datetime.now().strftime("%Y-%m-%d")
-        today_row = daily_tracker_df[daily_tracker_df['Date'] == today_str]
-        if not today_row.empty:
-            metrics['connections_sent_today'] = int(today_row['Connections_Sent'].iloc[0])
-            metrics['messages_sent_today'] = int(today_row['Messages_Sent'].iloc[0])
-            metrics['follow_ups_sent_today'] = int(today_row['Follow_ups_Sent'].iloc[0])
-            metrics['responses_received_today'] = int(today_row['Responses_Received'].iloc[0])
-            metrics['leads_converted_today'] = int(today_row['Leads_Converted'].iloc[0])
-
-    return metrics
-
-def get_current_day():
-    """Get current day of challenge"""
-    days_elapsed = (datetime.now() - datetime.strptime(st.session_state.challenge_start_date, "%Y-%m-%d")).days + 1
-    return min(max(days_elapsed, 1), 30)
-
-# ==================== AUTHENTICATION ==================== #
-def authenticate_user():
-    """Authentication interface"""
-    st.markdown("<div class='main-title'>🔐 LinkedIn Analytics Hub</div>", unsafe_allow_html=True)
-    st.markdown("<div class='sub-title'>Complete Edition - All Features Unified</div>", unsafe_allow_html=True)
+    # Assign colors based on the map, falling back to a default color
+    colors = [color_map.get(status, '#94a3b8') for status in status_counts['Status']]
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("""
-        <div style='background: rgba(255, 255, 255, 0.95); padding: 3rem; border-radius: 25px; 
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;'>
-            <h2 style='color: #667eea; margin-bottom: 2rem; font-weight: 800;'>🚀 Welcome!</h2>
-            <p style='color: #666; font-size: 1.1rem; margin-bottom: 2rem;'>
-                Upload your Google Service Account JSON to access all features
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("📁 Upload Service Account JSON", type=['json'])
-        
-        if uploaded_file:
-            try:
-                with st.spinner("🔄 Authenticating..."):
-                    credentials_json = uploaded_file.read().decode('utf-8')
-                    client = init_google_sheets(credentials_json)
-                    if client:
-                        st.session_state.authenticated = True
-                        st.session_state.gsheets_client = client
-                        st.success("✅ Authentication successful!")
-                        st.balloons()
-                        time.sleep(1)
-                        st.rerun()
-            except Exception as e:
-                st.error(f"❌ Authentication failed: {str(e)}")
-
-# ==================== DASHBOARD OVERVIEW ==================== #
-def show_dashboard_overview(metrics, daily_tracker_df):
-    st.markdown("<div class='section-header'>📊 Dashboard Overview</div>", unsafe_allow_html=True)
+    fig = px.pie(
+        status_counts, 
+        values='Count', 
+        names='Status', 
+        title='Lead Status Distribution',
+        color='Status',
+        color_discrete_map=color_map,
+        hole=0.4
+    )
     
-    col1, col2, col3, col4 = st.columns(4)
+    fig.update_traces(textinfo='percent+label', pull=[0.05] * len(status_counts))
+    fig.update_layout(
+        margin=dict(t=50, b=0, l=0, r=0),
+        legend_title_text='Status',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color="#333"),
+        title_font_color="#333",
+        title_font_size=20,
+    )
+    
+    return fig
+
+def create_daily_activity_chart(df):
+    """Creates a Plotly bar chart for daily activity metrics."""
+    if df.empty:
+        return go.Figure()
+        
+    # Melt the DataFrame to long format for Plotly
+    metrics = ['Connections_Sent', 'Messages_Sent', 'Follow_ups_Sent', 'Responses_Received', 'Leads_Converted']
+    df_melt = df.melt(id_vars=['Date'], value_vars=metrics, var_name='Metric', value_name='Count')
+    
+    # Define a color map for metrics
+    metric_colors = {
+        'Connections_Sent': '#667eea',
+        'Messages_Sent': '#764ba2',
+        'Follow_ups_Sent': '#ec4899',
+        'Responses_Received': '#f59e0b',
+        'Leads_Converted': '#10b981'
+    }
+
+    fig = px.bar(
+        df_melt, 
+        x='Date', 
+        y='Count', 
+        color='Metric', 
+        title='Daily Outreach Activity Over Time',
+        color_discrete_map=metric_colors,
+        barmode='group',
+        height=450
+    )
+    
+    fig.update_layout(
+        xaxis_title="Date",
+        yaxis_title="Count",
+        legend_title_text='Activity Type',
+        plot_bgcolor='rgba(240,240,240,1)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color="#333"),
+        title_font_color="#333",
+        xaxis={'categoryorder':'category ascending'},
+        hovermode="x unified"
+    )
+    
+    return fig
+
+def create_conversion_funnel(summary):
+    """Creates a Plotly funnel chart for the conversion pipeline."""
+    if not summary:
+        return go.Figure()
+
+    # Define the steps and values
+    steps = ["Outreach Sent", "Responses Received", "Leads Converted"]
+    outreach_sent = summary.get('total_connections', 0) + summary.get('total_messages', 0) + summary.get('total_followups', 0)
+    values = [
+        outreach_sent,
+        summary.get('total_responses', 0),
+        summary.get('total_leads', 0)
+    ]
+    
+    # Filter out zero values to prevent errors in the chart
+    data = [(s, v) for s, v in zip(steps, values) if v > 0]
+    if not data:
+        return go.Figure()
+        
+    steps, values = zip(*data)
+    
+    colors = ['#667eea', '#f59e0b', '#10b981']
+    
+    fig = go.Figure(data=[
+        go.Funnel(
+            y=list(steps),
+            x=list(values),
+            textinfo="value+percent initial",
+            marker={"color": colors[:len(steps)]},
+            connector={"line": {"color": "gray", "dash": "dot", "width": 2}}
+        )
+    ])
+    
+    fig.update_layout(
+        title='Outreach to Conversion Funnel',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color="#333"),
+        title_font_color="#333",
+        height=450,
+        margin=dict(t=50, b=0, l=50, r=50)
+    )
+    
+    return fig
+
+# ==================== MAIN APP LAYOUT ==================== #
+
+def main_app():
+    """The main function to run the Streamlit application."""
+    
+    # --- 1. Authentication and Data Loading ---
+    client = get_gsheets_client()
+    
+    # Initialize data caches if they don't exist
+    if st.session_state.sheets_data is None:
+        st.session_state.sheets_data = {}
+    if st.session_state.leads_sheets_data is None:
+        st.session_state.leads_sheets_data = {}
+
+    # Load data
+    with st.spinner("Loading data from Google Sheets..."):
+        # Load chat history
+        chat_df_raw = load_data_from_gsheets(CHAT_SPREADSHEET_ID, CHAT_SHEET_NAME, use_cache=st.session_state.auto_refresh)
+        st.session_state.chat_df = process_chat_data(chat_df_raw)
+        
+        # Load leads database (CRM)
+        leads_df_raw = load_leads_data(LEADS_DATABASE_SHEET_ID, LEADS_SHEET_GID, use_cache=st.session_state.auto_refresh)
+        st.session_state.leads_database = process_outreach_data(leads_df_raw)
+        
+        # Load daily tracker
+        st.session_state.daily_tracker = load_daily_tracker_data(client)
+    
+    # --- 2. Sidebar and Configuration ---
+    with st.sidebar:
+        st.markdown(f'<h3 style="color:#667eea; font-weight:800;">{MY_PROFILE["name"]}</h3>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:0.9rem; margin-top:-10px;"><a href="{MY_PROFILE["url"]}" target="_blank" style="color:#764ba2;">View LinkedIn Profile</a></p>', unsafe_allow_html=True)
+        
+        st.header("App Settings")
+        
+        # Multi-page navigation (simple version)
+        st.session_state.current_page = st.radio(
+            "Navigation",
+            ["🏠 Dashboard", "💬 CRM & Messaging", "📊 Daily Tracker", "⚙️ Integrations & Logs"],
+            index=["🏠 Dashboard", "💬 CRM & Messaging", "📊 Daily Tracker", "⚙️ Integrations & Logs"].index(st.session_state.current_page)
+        )
+        
+        st.subheader("Data Management")
+        st.session_state.auto_refresh = st.checkbox("Auto-refresh data", value=st.session_state.auto_refresh)
+        if st.session_state.auto_refresh:
+            st.session_state.refresh_interval = st.slider("Refresh interval (seconds)", 30, 300, st.session_state.refresh_interval, 30)
+        
+        if st.button("Manual Refresh Data", use_container_width=True):
+            st.session_state.sheets_data = None # Clear cache
+            st.session_state.leads_sheets_data = None # Clear cache
+            st.session_state.last_refresh = datetime.utcnow()
+            st.rerun()
+            
+        st.subheader("UI Settings")
+        st.session_state.show_notifications = st.checkbox("Show Toast Notifications", value=st.session_state.show_notifications)
+        # st.session_state.dark_mode = st.checkbox("Dark Mode (Experimental)", value=st.session_state.dark_mode)
+        
+        st.markdown("---")
+        st.caption(f"Last Data Refresh: {st.session_state.last_refresh.strftime('%H:%M:%S UTC')}")
+        st.caption("Powered by Streamlit & Google Sheets")
+
+    # --- 3. Main Content Rendering ---
+    
+    st.markdown(f'<h1 class="main-title">{st.session_state.current_page}</h1>', unsafe_allow_html=True)
+    
+    if st.session_state.current_page == "🏠 Dashboard":
+        render_dashboard()
+    elif st.session_state.current_page == "💬 CRM & Messaging":
+        render_crm()
+    elif st.session_state.current_page == "📊 Daily Tracker":
+        render_daily_tracker()
+    elif st.session_state.current_page == "⚙️ Integrations & Logs":
+        render_integrations_logs()
+        
+    # --- 4. Auto-refresh logic ---
+    if st.session_state.auto_refresh:
+        time.sleep(st.session_state.refresh_interval)
+        st.rerun()
+
+# ==================== PAGE RENDERERS ==================== #
+
+def render_dashboard():
+    """Renders the main dashboard page."""
+    
+    # --- Data Summary ---
+    daily_summary = get_daily_summary(st.session_state.daily_tracker)
+    
+    if not daily_summary:
+        st.warning("No daily tracker data found to display the dashboard. Please check your Google Sheet configuration.")
+        return
+        
+    st.markdown('<p class="sub-title">Key Performance Indicators & Conversion Metrics</p>', unsafe_allow_html=True)
+
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-icon">👥</div>
-            <div class="metric-value">{metrics['total_leads']}</div>
-            <div class="metric-label">Total Leads</div>
+            <div class="metric-icon">🤝</div>
+            <div class="metric-value">{daily_summary.get('total_connections', 0):,}</div>
+            <div class="metric-label">Connections Sent</div>
         </div>
         """, unsafe_allow_html=True)
-    
+        
     with col2:
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-icon">✉️</div>
+            <div class="metric-value">{daily_summary.get('total_messages', 0) + daily_summary.get('total_followups', 0):,}</div>
+            <div class="metric-label">Total Messages</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col3:
         st.markdown(f"""
         <div class="metric-card">
             <div class="metric-icon">💬</div>
-            <div class="metric-value">{metrics['messages_sent']}</div>
-            <div class="metric-label">Messages Sent</div>
+            <div class="metric-value">{daily_summary.get('total_responses', 0):,}</div>
+            <div class="metric-label">Responses Received</div>
         </div>
         """, unsafe_allow_html=True)
-    
-    with col3:
+        
+    with col4:
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-icon">💰</div>
+            <div class="metric-value">{daily_summary.get('total_leads', 0):,}</div>
+            <div class="metric-label">Leads Converted</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col5:
         st.markdown(f"""
         <div class="metric-card">
             <div class="metric-icon">📈</div>
-            <div class="metric-value">{metrics['response_rate']}%</div>
-            <div class="metric-label">Response Rate</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col4:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-icon">✅</div>
-            <div class="metric-value">{metrics['conversion_rate']}%</div>
+            <div class="metric-value">{daily_summary.get('conversion_rate', 0):.2f}%</div>
             <div class="metric-label">Conversion Rate</div>
         </div>
         """, unsafe_allow_html=True)
+
+    st.markdown("---")
     
-    # Section 2: Daily Habit Tracker
-    st.markdown("<div class='section-header'>📅 Daily Habit Tracker - 30 Day Challenge</div>", unsafe_allow_html=True)
+    # --- Charts ---
+    chart_col1, chart_col2 = st.columns([2, 1])
     
-    current_day = get_current_day()
-    st.markdown(f"<p style='text-align: center; color: white; font-size: 1.5rem; font-weight: 700;'>Day {current_day} of 30</p>", unsafe_allow_html=True)
+    with chart_col1:
+        st.subheader("Activity Trends")
+        st.plotly_chart(create_daily_activity_chart(daily_summary['df']), use_container_width=True)
+        
+    with chart_col2:
+        st.subheader("Conversion Pipeline")
+        st.plotly_chart(create_conversion_funnel(daily_summary), use_container_width=True)
+        
+    st.markdown("---")
     
-    if not daily_tracker_df.empty and current_day <= len(daily_tracker_df):
-        today_row = daily_tracker_df.iloc[current_day - 1]
-        
-        col1, col2, col3, col4, col5 = st.columns(5)
-        
-        with col1:
-            st.markdown(f"""
-            <div class="stat-box" style="border-top-color: #667eea;">
-                <div class="metric-icon">🔗</div>
-                <div class="stat-number">{int(today_row.get('Connections_Sent', 0))}</div>
-                <div class="stat-label">Connections</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown(f"""
-            <div class="stat-box" style="border-top-color: #764ba2;">
-                <div class="metric-icon">💬</div>
-                <div class="stat-number">{int(today_row.get('Messages_Sent', 0))}</div>
-                <div class="stat-label">Messages</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown(f"""
-            <div class="stat-box" style="border-top-color: #667eea;">
-                <div class="metric-icon">⬆️</div>
-                <div class="stat-number">{int(today_row.get('Follow_ups_Sent', 0))}</div>
-                <div class="stat-label">Follow-ups</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col4:
-            st.markdown(f"""
-            <div class="stat-box" style="border-top-color: #764ba2;">
-                <div class="metric-icon">📩</div>
-                <div class="stat-number">{int(today_row.get('Responses_Received', 0))}</div>
-                <div class="stat-label">Responses</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col5:
-            st.markdown(f"""
-            <div class="stat-box" style="border-top-color: #667eea;">
-                <div class="metric-icon">💰</div>
-                <div class="stat-number">{int(today_row.get('Leads_Converted', 0))}</div>
-                <div class="stat-label">Converted</div>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("No daily tracker data available for today.")
-
-    # Habit Tracker Chart
-    if not daily_tracker_df.empty:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("### 📈 30-Day Challenge Progress")
-        
-        # Create a date range for the challenge
-        start_date = datetime.strptime(st.session_state.challenge_start_date, "%Y-%m-%d")
-        challenge_dates = [start_date + timedelta(days=i) for i in range(30)]
-        challenge_df = pd.DataFrame({'Date': [d.strftime("%Y-%m-%d") for d in challenge_dates]})
-        
-        # Merge with actual data
-        display_df = pd.merge(challenge_df, daily_tracker_df, on='Date', how='left').fillna(0)
-        display_df['Day'] = range(1, 31)
-
-        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1,
-                            subplot_titles=("Daily Activity", "Conversion & Response"))
-
-        # Trace 1: Connections, Messages, Follow-ups
-        fig.add_trace(go.Scatter(x=display_df['Day'], y=display_df['Connections_Sent'], mode='lines+markers', name='Connections Sent', line=dict(color='#667eea')), row=1, col=1)
-        fig.add_trace(go.Scatter(x=display_df['Day'], y=display_df['Messages_Sent'], mode='lines+markers', name='Messages Sent', line=dict(color='#764ba2')), row=1, col=1)
-        fig.add_trace(go.Scatter(x=display_df['Day'], y=display_df['Follow_ups_Sent'], mode='lines+markers', name='Follow-ups Sent', line=dict(color='#a266ea')), row=1, col=1)
-        
-        # Trace 2: Responses, Converted
-        fig.add_trace(go.Scatter(x=display_df['Day'], y=display_df['Responses_Received'], mode='lines+markers', name='Responses Received', line=dict(color='#10b981')), row=2, col=1)
-        fig.add_trace(go.Scatter(x=display_df['Day'], y=display_df['Leads_Converted'], mode='lines+markers', name='Leads Converted', line=dict(color='#059669')), row=2, col=1)
-
-        fig.update_layout(height=700, title_text="30-Day Challenge Progress",
-                          plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(255,255,255,0.95)',
-                          font=dict(family='Inter', size=12), title_font_size=20, title_font_color='#667eea',
-                          hovermode="x unified")
-        fig.update_xaxes(title_text="Day of Challenge")
-        fig.update_yaxes(title_text="Count", row=1, col=1)
-        fig.update_yaxes(title_text="Count", row=2, col=1)
-        st.plotly_chart(fig, use_container_width=True)
-
-# ==================== CONVERSATION HISTORY ==================== #
-def show_conversation_history(chat_df):
-    st.markdown("<div class='section-header'>💬 Conversation History</div>", unsafe_allow_html=True)
-
-    if chat_df.empty:
-        st.info("No chat history available.")
-        return
-
-    # Ensure 'timestamp' column exists before processing
-    if 'timestamp' not in chat_df.columns:
-        st.warning("The 'timestamp' column is missing from the chat data. Displaying without time-based filtering/sorting.")
-        chat_df['timestamp'] = pd.NaT # Add a NaT column if missing
+    # --- Leads and Statuses ---
+    st.subheader("Lead Status Overview")
     
-    # Pre-process chat_df for display
-    chat_df["is_me"] = chat_df.apply(lambda row: is_me(row.get("sender_name"), row.get("sender_url"), MY_PROFILE), axis=1)
-    chat_df["display_name"] = chat_df.apply(lambda row: MY_PROFILE["name"] if row["is_me"] else row.get("sender_name", "Unknown"), axis=1)
-    chat_df["initials"] = chat_df["display_name"].apply(get_initials)
-    chat_df["message_type"] = chat_df["is_me"].apply(lambda x: "sent" if x else "received")
-    chat_df["parsed_time"] = chat_df["timestamp"].apply(parse_timestamp)
-
-    # Sort by timestamp if 'parsed_time' is valid
-    if not chat_df['parsed_time'].isnull().all():
-        chat_df = chat_df.sort_values(by="parsed_time", ascending=False).reset_index(drop=True)  # Filters
-    col1, col2, col3 = st.columns([1,1,2])
-    with col1:
-        message_type_filter = st.selectbox("Filter by Type", ['All', 'Sent', 'Received'], key='chat_type_filter')
-    with col2:
-        date_range_filter = st.selectbox("Date Range", ["All Time", "Last 7 Days", "Last 30 Days"], key='chat_date_filter')
-    with col3:
-        search_query = st.text_input("Search messages...", key='chat_search_query')
-
-    filtered_chat_df = chat_df.copy()
-
-    if message_type_filter == 'Sent':
-        filtered_chat_df = filtered_chat_df[filtered_chat_df['message_type'] == 'sent']
-    elif message_type_filter == 'Received':
-        filtered_chat_df = filtered_chat_df[filtered_chat_df['message_type'] == 'received']
-
-    if date_range_filter == "Last 7 Days":
-        cutoff_date = datetime.now() - timedelta(days=7)
-        filtered_chat_df = filtered_chat_df[filtered_chat_df['parsed_time'] >= cutoff_date]
-    elif date_range_filter == "Last 30 Days":
-        cutoff_date = datetime.now() - timedelta(days=30)
-        filtered_chat_df = filtered_chat_df[filtered_chat_df['parsed_time'] >= cutoff_date]
-
-    if search_query:
-        filtered_chat_df = filtered_chat_df[filtered_chat_df['message'].str.contains(search_query, case=False, na=False)]
-
-    st.markdown(f"<p style='color: white; font-size: 1.1rem;'>Displaying {len(filtered_chat_df)} of {len(chat_df)} messages</p>", unsafe_allow_html=True)
-
-    for i, row in filtered_chat_df.iterrows():
-        col_img, col_msg = st.columns([0.1, 0.9])
-        with col_img:
-            st.markdown(f"<div class='profile-badge'>{row['initials']}</div>", unsafe_allow_html=True)
-        with col_msg:
-            st.markdown(f"""
-            <div class='message-card-all'>
-                <p style='font-weight: 700; color: #667eea;'>{row['display_name']} <span style='font-weight: 400; color: #999; font-size: 0.8em;'>({row['parsed_time'].strftime('%Y-%m-%d %H:%M:%S') if row['parsed_time'] else 'N/A'})</span></p>
-                <p style='color: #333;'>{row['message']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-# ==================== CRM DASHBOARD ==================== #
-def show_crm_dashboard(outreach_df):
-    st.markdown("<div class='section-header'>📋 CRM Dashboard</div>", unsafe_allow_html=True)
-
-    if outreach_df.empty:
-        st.info("No outreach data available. Go to 'Search & Send' to add leads.")
-        return
-
-    # Pre-process outreach_df for display
-    if 'timestamp' in outreach_df.columns:
-        outreach_df['parsed_time'] = outreach_df['timestamp'].apply(parse_timestamp)
-    else:
-        outreach_df['parsed_time'] = pd.NaT # Not a Time
-
-    # Filters
-    col1, col2, col3 = st.columns([1,1,2])
-    with col1:
-        status_filter = st.selectbox("Filter by Status", ['all', 'sent', 'pending', 'ready_to_send', 'responded'], key='crm_status_filter')
-    with col2:
-        date_range_filter = st.selectbox("Date Range", [7, 30, 90, "All Time"], format_func=lambda x: f"Last {x} Days" if isinstance(x, int) else x, key='crm_date_filter')
-    with col3:
-        search_query = st.text_input("Search leads...", key='crm_search_query')
-
-    filters = {
-        'status': status_filter,
-        'date_range': date_range_filter if isinstance(date_range_filter, int) else None,
-        'search_query': search_query
-    }
-    filtered_df = filter_dataframe(outreach_df, filters)    st.markdown(f"<p style=\'color: white; font-size: 1.1rem;\'>Displaying {len(filtered_df)} of {len(outreach_df)} leads</p>", unsafe_allow_html=True)
-
-    # Editable DataFrame
-    st.markdown("### ✍️ Edit Leads Data")
-    edited_df = st.data_editor(filtered_df, num_rows="dynamic", use_container_width=True, key="crm_data_editor")
-
-    if st.button("💾 Save Edited Leads to Google Sheet", key="save_edited_leads", type="primary"):
-        if not edited_df.equals(filtered_df): # Only save if changes were made
-            try:
-                client = st.session_state.gsheets_client
-                spreadsheet = client.open_by_key(OUTREACH_SPREADSHEET_ID)
-                worksheet = spreadsheet.worksheet(OUTREACH_SHEET_NAME)
-                
-                # Clear existing data and write the new data
-                worksheet.clear()
-                worksheet.update([edited_df.columns.values.tolist()] + edited_df.values.tolist())
-                st.success("✅ Leads data saved successfully to Google Sheet!")
-                st.cache_data.clear()
-                st.rerun()
-            except Exception as e:
-                st.error(f"❌ Error saving data to Google Sheet: {e}")
+    lead_col1, lead_col2 = st.columns([1, 2])
+    
+    with lead_col1:
+        st.plotly_chart(create_status_pie_chart(st.session_state.leads_database), use_container_width=True)
+        
+    with lead_col2:
+        st.subheader("Top 5 Recent Conversations")
+        
+        # Merge chat and leads data to get contact details
+        if not st.session_state.chat_df.empty and not st.session_state.leads_database.empty:
+            # Get the latest message for each contact
+            latest_messages = st.session_state.chat_df.sort_values('Timestamp', ascending=False).drop_duplicates(subset=['Contact_URL'])
+            
+            # Filter out messages sent by 'Me' to focus on replies/conversations
+            latest_replies = latest_messages[latest_messages['Sender_Name'] != MY_PROFILE["name"]]
+            
+            # Join with leads data to get status and other info
+            recent_conversations = latest_replies.merge(
+                st.session_state.leads_database[['Contact_URL', 'Status', 'Contact_Name', 'Title', 'Company']],
+                on='Contact_URL',
+                how='left'
+            ).head(5)
+            
+            if not recent_conversations.empty:
+                for index, row in recent_conversations.iterrows():
+                    # Check if the contact is in the leads database
+                    if pd.notna(row['Contact_Name']):
+                        with st.container(border=False):
+                            col_icon, col_content = st.columns([0.5, 3])
+                            
+                            with col_icon:
+                                initials = get_profile_initials(row['Contact_Name'])
+                                st.markdown(f'<div class="profile-badge">{initials}</div>', unsafe_allow_html=True)
+                                
+                            with col_content:
+                                st.markdown(f'<p style="font-size:1.1rem; font-weight:700; margin-bottom:0;">{row["Contact_Name"]}</p>', unsafe_allow_html=True)
+                                st.markdown(f'<p style="font-size:0.85rem; margin-top:0; color:#666;">{row["Title"]} at {row["Company"]}</p>', unsafe_allow_html=True)
+                                st.markdown(get_status_badge(row['Status']), unsafe_allow_html=True)
+                                
+                            st.divider()
+            else:
+                st.info("No recent replies found in chat history.")
         else:
-            st.info("No changes detected to save.")
-
-
-
-    # Stats for CRM
-    total_leads = len(filtered_df)
-    sent = len(filtered_df[filtered_df.apply(is_message_sent, axis=1)])
-    pending = len(filtered_df[filtered_df['status'] == 'pending']) if 'status' in filtered_df.columns else 0
-    ready = len(filtered_df[filtered_df['status'] == 'ready_to_send']) if 'status' in filtered_df.columns else 0
-
-    st.markdown("""
-    <div class="stats-grid">
-    """, unsafe_allow_html=True)
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown(f"""
-        <div class="stat-box" style="border-top-color: #667eea;">
-            <div class="metric-icon">👥</div>
-            <div class="stat-number">{total_leads}</div>
-            <div class="stat-label">Total Leads</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"""
-        <div class="stat-box" style="border-top-color: #10b981;">
-            <div class="metric-icon">✅</div>
-            <div class="stat-number">{sent}</div>
-            <div class="stat-label">Messages Sent</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col3:
-        st.markdown(f"""
-        <div class="stat-box" style="border-top-color: #f59e0b;">
-            <div class="metric-icon">⏳</div>
-            <div class="stat-number">{pending}</div>
-            <div class="stat-label">Pending</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col4:
-        st.markdown(f"""
-        <div class="stat-box" style="border-top-color: #22c55e;">
-            <div class="metric-icon">🚀</div>
-            <div class="stat-number">{ready}</div>
-            <div class="stat-label">Ready to Send</div>
-        </div>
-        """, unsafe_allow_html=True)
-    st.markdown("</div><br>", unsafe_allow_html=True)
-
-    # Export options
-    col1, col2, col3 = st.columns([1, 1, 2])
-    with col1:
-        if st.button("📥 Export to CSV", use_container_width=True, key='crm_export_csv_btn'):
-            csv_data = export_to_csv(filtered_df)
-            st.download_button(
-                label="⬇️ Download CSV",
-                data=csv_data,
-                file_name=f"leads_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                mime="text/csv",
-                key='crm_download_csv_btn'
-            )
+            st.info("Chat or Leads data is empty. Cannot display recent conversations.")
+            
+def render_crm():
+    """Renders the CRM and Messaging page."""
     
-    with col2:
-        if st.button("📊 Generate Report", use_container_width=True, key='crm_generate_report_btn'):
-            st.info("📊 Report generation feature coming soon!")
+    st.markdown('<p class="sub-title">Manage Leads, View Conversations, and Update Statuses</p>', unsafe_allow_html=True)
+    
+    # --- Filtering and Search ---
+    
+    col_search, col_status, col_sort = st.columns([3, 2, 1])
+    
+    with col_search:
+        st.session_state.search_query = st.text_input("Search Leads (Name, Title, Company)", st.session_state.search_query, placeholder="e.g., John Doe, CEO, TechCorp")
+        
+    with col_status:
+        status_options = ['all'] + st.session_state.leads_database['Status'].unique().tolist()
+        st.session_state.filter_status = st.selectbox("Filter by Status", status_options, index=status_options.index(st.session_state.filter_status))
+        
+    with col_sort:
+        sort_options = ['Last_Message_Date', 'Status', 'Contact_Name']
+        st.session_state.sort_by = st.selectbox("Sort By", sort_options, index=sort_options.index(st.session_state.sort_by))
 
-    # Lead Cards (Display only, editing handled by st.data_editor above)
-    # st.markdown("<br>", unsafe_allow_html=True)
-    # for idx, (i, row) in enumerate(filtered_df.iterrows()):
-    #     with st.container():
-    #         linkedin_url = row.get(\'linkedin_url\', \'#\')
-    #         profile_name = row.get(\'profile_name\', \'Unknown\')
-    #         tagline = row.get(\'profile_tagline\', \'N/A\')
-    #         message = row.get(\'linkedin_message\', \'No message available\')
-    #         timestamp = row.get(\'timestamp\', \'N/A\')
-    #         location = row.get(\'profile_location\', \'N/A\')
-    #         company = row.get(\'company_name\', \'N/A\')
-    #         status = row.get(\'status\', \'unknown\')
-            
-    #         # Status badge
-    #         status_class = {
-    #             \'sent\': \'status-sent\',
-    #             \'pending\': \'status-pending\',
-    #             \'ready_to_send\': \'status-ready\',
-    #             \'responded\': \'status-success\'
-    #         }.get(status, \'status-pending\')
-            
-    #         # Check if favorited
-    #         lead_id = generate_lead_id(profile_name, linkedin_url)
-    #         is_favorited = lead_id in st.session_state.favorites
-    #         has_notes = lead_id in st.session_state.notes
-    #         lead_tags = st.session_state.tags.get(lead_id, [])
-            
-    #         st.markdown(f\"\"\"
-    #         <div class=\"lead-card\">\n                <div style=\"display: flex; align-items: start; gap: 1.5rem; margin-bottom: 1rem;\">\n                    <div class=\"profile-badge\">{get_initials(profile_name)}</div>\n                    <div style=\"flex: 1;\">\n                        <div style=\"display: flex; justify-content: space-between; align-items: start;\">\n                            <div>\n                                <h3 class=\"lead-title\">{profile_name}</h3>\n                                <p class=\"lead-sub\">💼 {tagline}</p>\n                            </div>\n                            <span class=\"status-badge {status_class}\">{status.replace(\'_\', \' \').title()}</span>\n                        </div>\n                        <div style=\"display: flex; gap: 2rem; margin: 1rem 0; flex-wrap: wrap;\">\n                            <span style=\"color: #666;\">📍 {location}</span>\n                            <span style=\"color: #666;\">🏢 {company}</span>\n                            <span style=\"color: #666;\">🕐 {timestamp}</span>\n                        </div>\n                        {\"<div style=\'margin: 0.5rem 0;\'>\" + \".\".join([f\"<span class=\'tag-badge\'>{tag}</span>\" for tag in lead_tags]) + \"</div>\" if lead_tags else \"\"}\n                    </div>\n                </div>\n                \n                <div class=\"lead-msg\">\n                    <strong style=\"color: #667eea; font-size: 1.1rem;\">📩 Outreach Message:</strong><br><br>\n                    {message}\n                </div>\n            \"\"\", unsafe_allow_html=True)
-            
-    #         # Display notes if any
-    #         if has_notes:
-    #             st.markdown(f\"\"\"
-    #             <div class=\"note-card\">\n                    <strong>📝 Note:</strong> {st.session_state.notes[lead_id]}\n                </div>\n                \"\"\", unsafe_allow_html=True)
-            
-    #         st.markdown(\"<div class=\'action-buttons\'>\", unsafe_allow_html=True)
-    #         st.markdown(f\"\"\"
-    #             <a href=\"{linkedin_url}\" target=\"_blank\" class=\"action-btn\">\n                    🔗 View LinkedIn Profile\n                </a>\n            \"\"\", unsafe_allow_html=True)
-            
-    #         # Action buttons for each lead
-    #         col_btn1, col_btn2, col_btn3, col_btn4, col_btn5 = st.columns(5)
-            
-    #         with col_btn1:
-    #             if st.button(\"✉️ Send Message\", key=f\"crm_lead_send_{i}_{idx}\", use_container_width=True):
-        with st.container():
-            linkedin_url = row.get('linkedin_url', '#')
-            profile_name = row.get('profile_name', 'Unknown')
-            tagline = row.get('profile_tagline', 'N/A')
-            message = row.get('linkedin_message', 'No message available')
-            timestamp = row.get('timestamp', 'N/A')
-            location = row.get('profile_location', 'N/A')
-            company = row.get('company_name', 'N/A')
-            status = row.get('status', 'unknown')
-            
-            # Status badge
-            status_class = {
-                'sent': 'status-sent',
-                'pending': 'status-pending',
-                'ready_to_send': 'status-ready',
-                'responded': 'status-success'
-            }.get(status, 'status-pending')
-            
-            # Check if favorited
-            lead_id = generate_lead_id(profile_name, linkedin_url)
-            is_favorited = lead_id in st.session_state.favorites
-            has_notes = lead_id in st.session_state.notes
-            lead_tags = st.session_state.tags.get(lead_id, [])
-            
-            st.markdown(f"""
-            <div class="lead-card">
-                <div style="display: flex; align-items: start; gap: 1.5rem; margin-bottom: 1rem;">
-                    <div class="profile-badge">{get_initials(profile_name)}</div>
-                    <div style="flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div>
-                                <h3 class="lead-title">{profile_name}</h3>
-                                <p class="lead-sub">💼 {tagline}</p>
-                            </div>
-                            <span class="status-badge {status_class}">{status.replace('_', ' ').title()}</span>
-                        </div>
-                        <div style="display: flex; gap: 2rem; margin: 1rem 0; flex-wrap: wrap;">
-                            <span style="color: #666;">📍 {location}</span>
-                            <span style="color: #666;">🏢 {company}</span>
-                            <span style="color: #666;">🕐 {timestamp}</span>
-                        </div>
-                        {"<div style='margin: 0.5rem 0;'>" + "".join([f"<span class='tag-badge'>{tag}</span>" for tag in lead_tags]) + "</div>" if lead_tags else ""}
-                    </div>
-                </div>
+    # --- Apply Filters and Sort ---
+    
+    filtered_df = st.session_state.leads_database.copy()
+    
+    # Status filter
+    if st.session_state.filter_status != 'all':
+        filtered_df = filtered_df[filtered_df['Status'] == st.session_state.filter_status]
+        
+    # Search filter
+    if st.session_state.search_query:
+        search_term = st.session_state.search_query.lower()
+        filtered_df = filtered_df[
+            filtered_df['Contact_Name'].astype(str).str.lower().str.contains(search_term) |
+            filtered_df['Title'].astype(str).str.lower().str.contains(search_term) |
+            filtered_df['Company'].astype(str).str.lower().str.contains(search_term)
+        ]
+        
+    # Sort
+    filtered_df = filtered_df.sort_values(by=st.session_state.sort_by, ascending=False)
+    
+    # --- Layout ---
+    
+    lead_list_col, conversation_col = st.columns([1, 2])
+    
+    # --- Lead List ---
+    with lead_list_col:
+        st.subheader(f"Leads ({len(filtered_df)})")
+        
+        if filtered_df.empty:
+            st.info("No leads match the current filters.")
+        else:
+            # Display lead cards
+            for index, row in filtered_df.iterrows():
+                contact_url = row['Contact_URL']
                 
-                <div class="lead-msg">
-                    <strong style="color: #667eea; font-size: 1.1rem;">📩 Outreach Message:</strong><br><br>
-                    {message}
-                </div>
-            """, unsafe_allow_html=True)
+                # Check if this is the currently selected contact
+                is_selected = st.session_state.selected_contact == contact_url
+                
+                # Create a clickable container using a button-like structure
+                style = """
+                    cursor: pointer; 
+                    padding: 1rem; 
+                    border-radius: 10px; 
+                    margin-bottom: 0.5rem; 
+                    transition: all 0.2s;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                """
+                if is_selected:
+                    style += "background-color: #e6e9f0; border: 2px solid #667eea;"
+                else:
+                    style += "background-color: #f8f8f8; border: 1px solid #eee;"
+                
+                # Use a unique key for the button/container to make it clickable
+                if st.button(
+                    key=f"select_lead_{contact_url}",
+                    label=f"""
+                        <div style="{style}">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="font-weight: 700; color: #333; font-size: 1rem;">{row['Contact_Name']}</div>
+                                <div style="font-size: 0.75rem; color: #999;">{row['Last_Message_Date']}</div>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #666;">{row['Title']} at {row['Company']}</div>
+                            <div style="margin-top: 0.5rem;">{get_status_badge(row['Status'])}</div>
+                        </div>
+                    """,
+                    use_container_width=True,
+                    unsafe_allow_html=True
+                ):
+                    st.session_state.selected_contact = contact_url
+                    st.rerun() # Rerun to update the conversation column
+                    
+    # --- Conversation View ---
+    with conversation_col:
+        
+        if st.session_state.selected_contact:
+            # Get the selected lead's data
+            selected_lead = filtered_df[filtered_df['Contact_URL'] == st.session_state.selected_contact].iloc[0]
             
-            # Display notes if any
-            if has_notes:
+            st.markdown(f'<h2 class="lead-title">{selected_lead["Contact_Name"]}</h2>', unsafe_allow_html=True)
+            st.markdown(f'<p class="lead-sub">{selected_lead["Title"]} at {selected_lead["Company"]}</p>', unsafe_allow_html=True)
+            
+            # Tabs for Conversation, Details, and Actions
+            tab_conv, tab_details, tab_actions = st.tabs(["Conversation", "Details", "Actions"])
+            
+            with tab_conv:
+                # Display message history
+                history_html = get_message_history(st.session_state.chat_df, st.session_state.selected_contact)
                 st.markdown(f"""
-                <div class="note-card">
-                    <strong>📝 Note:</strong> {st.session_state.notes[lead_id]}
+                <div style="height: 500px; overflow-y: auto; background-color: white; padding: 1.5rem; border-radius: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
+                    {history_html}
                 </div>
                 """, unsafe_allow_html=True)
-            
-            st.markdown("<div class='action-buttons'>", unsafe_allow_html=True)
-            st.markdown(f"""
-                <a href="{linkedin_url}" target="_blank" class="action-btn">
-                    🔗 View LinkedIn Profile
-                </a>
-            """, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-            # Action buttons for each lead
-            col_btn1, col_btn2, col_btn3, col_btn4, col_btn5 = st.columns(5)
-            
-            with col_btn1:
-                if st.button("✉️ Send Message", key=f"crm_lead_send_{i}_{idx}", use_container_width=True):
-                    success, response = send_webhook_request(WEBHOOK_URL, {
-                        'action': 'send_message',
-                        'profile_url': linkedin_url,
-                        'message': message
-                    })
-                    if success:
-                        st.success("✅ Message sent successfully!")
-                    else:
-                        st.error(f"❌ Failed to send: {response}")
-            
-            with col_btn2:
-                if st.button("📧 Send Email", key=f"crm_lead_email_{i}_{idx}", use_container_width=True):
-                    st.session_state.email_queue.append({
-                        'to': profile_name,
-                        'subject': f"Following up on LinkedIn",
-                        'body': message
-                    })
-                    st.success("✅ Email queued!")
-            
-            with col_btn3:
-                fav_icon = "⭐" if is_favorited else "☆"
-                if st.button(f"{fav_icon} Favorite", key=f"crm_lead_fav_{i}_{idx}", use_container_width=True):
-                    if is_favorited:
-                        st.session_state.favorites.remove(lead_id)
-                        st.info("Removed from favorites")
-                    else:
-                        st.session_state.favorites.add(lead_id)
-                        st.success("⭐ Added to favorites!")
+                
+            with tab_details:
+                st.subheader("Contact Information")
+                st.json(selected_lead.to_dict())
+                
+                st.subheader("Notes")
+                current_notes = st.session_state.notes.get(st.session_state.selected_contact, "")
+                new_notes = st.text_area("Edit Notes", current_notes, height=150)
+                if new_notes != current_notes:
+                    st.session_state.notes[st.session_state.selected_contact] = new_notes
+                    add_log_entry(f"Notes updated for {selected_lead['Contact_Name']}")
                     st.rerun()
-            
-            with col_btn4:
-                if st.button("📝 Add Note", key=f"crm_lead_note_{i}_{idx}", use_container_width=True):
-                    st.session_state.selected_contact = lead_id
-            
-            with col_btn5:
-                if st.button("🏷️ Add Tag", key=f"crm_lead_tag_{i}_{idx}", use_container_width=True):
-                    st.session_state.selected_contact = f"tag_{lead_id}"
-            
-            # Note input
-            if st.session_state.selected_contact == lead_id:
-                note_text = st.text_area("Enter your note:", key=f"crm_note_input_{lead_id}")
-                col_save, col_cancel = st.columns(2)
-                with col_save:
-                    if st.button("💾 Save Note", key=f"crm_save_note_{lead_id}"):
-                        st.session_state.notes[lead_id] = note_text
-                        st.session_state.selected_contact = None
-                        st.success("📝 Note saved!")
-                        st.rerun()
-                with col_cancel:
-                    if st.button("❌ Cancel", key=f"crm_cancel_note_{lead_id}"):
-                        st.session_state.selected_contact = None
-                        st.rerun()
-            
-            # Tag input
-            if st.session_state.selected_contact == f"tag_{lead_id}":
-                tag_text = st.text_input("Enter tag:", key=f"crm_tag_input_{lead_id}")
-                col_save, col_cancel = st.columns(2)
-                with col_save:
-                    if st.button("💾 Add Tag", key=f"crm_save_tag_{lead_id}"):
-                        if lead_id not in st.session_state.tags:
-                            st.session_state.tags[lead_id] = []
-                        st.session_state.tags[lead_id].append(tag_text)
-                        st.session_state.selected_contact = None
-                        st.success("🏷️ Tag added!")
-                        st.rerun()
-                with col_cancel:
-                    if st.button("❌ Cancel", key=f"crm_cancel_tag_{lead_id}"):
-                        st.session_state.selected_contact = None
-                        st.rerun()
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-
-# ==================== SEARCH INTERFACE ==================== #
-def show_search_interface(webhook_url):
-    """Advanced lead search and generation interface"""
-    st.markdown("<div class='section-header'>🔍 Advanced Lead Search & Generation</div>", unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div style='background: rgba(255, 255, 255, 0.95); padding: 2.5rem; border-radius: 25px; 
-                text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin-bottom: 3rem;'>
-        <h2 style='color: #667eea; margin-bottom: 1rem; font-weight: 800;'>🌍 Global Business Intelligence</h2>
-        <p style='color: #666; font-size: 1.2rem; line-height: 1.8;'>
-            Search and connect with decision-makers worldwide. Target by job title, location, industry, 
-            and company size to generate highly qualified leads instantly.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Expanded job titles (100+)
-    SEARCH_TERMS = [
-        "Business Owner", "CEO", "Founder", "President", "Co-Founder", "Managing Director",
-        "VP of Sales", "VP of Marketing", "Marketing Director", "Sales Director", "Chief Operating Officer",
-        "Chief Financial Officer", "Chief Marketing Officer", "Chief Technology Officer", "Chief Strategy Officer",
-        "Partner", "Investor", "Consultant", "Business Analyst", "Strategic Advisor", "Operations Manager",
-        "Growth Manager", "Product Manager", "Head of Business Development", "Sales Executive", "Client Relations Manager",
-        "Customer Success Manager", "Account Executive", "Regional Manager", "General Manager", "Division Head",
-        "Director of Operations", "Director of Business Development", "Director of Strategy", "Chief of Staff",
-        "E-commerce Manager", "Digital Marketing Manager", "Brand Manager", "Content Strategist", "SEO Specialist",
-        "SEM Specialist", "Social Media Manager", "Community Manager", "Public Relations Manager", "Event Manager",
-        "HR Director", "Recruitment Manager", "Talent Acquisition Specialist", "Training and Development Manager",
-        "IT Director", "Software Engineer", "Data Scientist", "Machine Learning Engineer", "DevOps Engineer",
-        "Cybersecurity Analyst", "Network Administrator", "Systems Architect", "UI/UX Designer", "Web Developer",
-        "Mobile Developer", "Cloud Engineer", "Solutions Architect", "Technical Lead", "Project Manager",
-        "Program Manager", "Scrum Master", "Agile Coach", "Supply Chain Manager", "Logistics Manager",
-        "Procurement Manager", "Financial Analyst", "Investment Banker", "Portfolio Manager", "Auditor",
-        "Tax Advisor", "Economist", "Research Analyst", "Legal Counsel", "Compliance Officer",
-        "Healthcare Administrator", "Medical Director", "Pharmaceutical Sales Representative", "Biotech Scientist",
-        "Educator", "Professor", "Academic Dean", "Librarian", "Research Fellow", "Journalist",
-        "Editor", "Publisher", "Creative Director", "Art Director", "Copywriter", "Photographer",
-        "Videographer", "Animator", "Game Developer", "Architect", "Civil Engineer", "Mechanical Engineer",
-        "Electrical Engineer", "Chemical Engineer", "Environmental Engineer", "Geologist", "Urban Planner",
-        "Real Estate Agent", "Broker", "Property Manager", "Underwriter", "Claims Adjuster", "Actuary",
-        "Customer Service Manager", "Support Specialist", "Field Service Engineer", "Quality Assurance Manager",
-        "Manufacturing Engineer", "Operations Director", "Retail Manager", "Merchandiser", "Buyer",
-        "Franchise Owner", "Restaurant Manager", "Chef", "Sommelier", "Hotel Manager", "Travel Agent",
-        "Tour Operator", "Fitness Instructor", "Personal Trainer", "Nutritionist", "Wellness Coach",
-        "Therapist", "Counselor", "Social Worker", "Non-profit Director", "Volunteer Coordinator",
-        "Government Official", "Policy Advisor", "Diplomat", "Intelligence Analyst", "Military Officer"
-    ]
-
-    col1, col2 = st.columns(2)
-    with col1:
-        selected_job_title = st.selectbox("Target Job Title", SEARCH_TERMS, key='search_job_title')
-    with col2:
-        location = st.text_input("Target Location (e.g., 'New York', 'London')", key='search_location')
-
-    industry = st.text_input("Target Industry (e.g., 'Technology', 'Finance')", key='search_industry')
-    company_size = st.selectbox("Company Size", ['Any', '1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5001-10000', '10000+'], key='search_company_size')
-    num_leads = st.slider("Number of Leads to Generate", 1, 50, 10, key='search_num_leads')
-
-    if st.button("🚀 Generate Leads", use_container_width=True):
-        with st.spinner("Searching for leads..."):
-            # Simulate lead generation and add to outreach_df
-            new_leads_data = []
-            for i in range(num_leads):
-                profile_name = f"Generated Lead {len(st.session_state.outreach_df) + i + 1}"
-                linkedin_url = f"https://www.linkedin.com/in/generated-lead-{len(st.session_state.outreach_df) + i + 1}"
-                new_leads_data.append({
-                    'profile_name': profile_name,
-                    'linkedin_url': linkedin_url,
-                    'profile_tagline': f"{selected_job_title} at {industry} Co.",
-                    'linkedin_message': f"Hello {profile_name}, I found your profile while searching for {selected_job_title}s in {location}. I'd love to connect!",
-                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    'profile_location': location,
-                    'company_name': f"{industry} Co.",
-                    'status': 'ready_to_send',
-                    'success': 'false'
-                })
-            
-            new_leads_df = pd.DataFrame(new_leads_data)
-            st.session_state.outreach_df = pd.concat([st.session_state.outreach_df, new_leads_df], ignore_index=True)
-            st.success(f"✅ Generated {num_leads} new leads!")
-            st.rerun()
-
-    st.markdown("### 📥 Manually Add Lead")
-    with st.form("manual_lead_form"):
-        m_profile_name = st.text_input("Profile Name")
-        m_linkedin_url = st.text_input("LinkedIn Profile URL")
-        m_profile_tagline = st.text_input("Profile Tagline")
-        m_linkedin_message = st.text_area("Outreach Message")
-        m_profile_location = st.text_input("Location")
-        m_company_name = st.text_input("Company Name")
-        
-        submitted = st.form_submit_button("➕ Add Lead Manually")
-        if submitted:
-            if m_profile_name and m_linkedin_url and m_linkedin_message:
-                new_lead = pd.DataFrame([{
-                    'profile_name': m_profile_name,
-                    'linkedin_url': m_linkedin_url,
-                    'profile_tagline': m_profile_tagline,
-                    'linkedin_message': m_linkedin_message,
-                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    'profile_location': m_profile_location,
-                    'company_name': m_company_name,
-                    'status': 'ready_to_send',
-                    'success': 'false'
-                }])
-                st.session_state.outreach_df = pd.concat([st.session_state.outreach_df, new_lead], ignore_index=True)
-                st.success(f"✅ Lead '{m_profile_name}' added successfully!")
-                st.rerun()
-            else:
-                st.error("Profile Name, LinkedIn URL, and Outreach Message are required.")
-
-# ==================== ANALYTICS ==================== #
-def show_analytics(chat_df, outreach_df):
-    st.markdown("<div class='section-header'>📊 Advanced Analytics</div>", unsafe_allow_html=True)
-
-    if chat_df.empty and outreach_df.empty:
-        st.info("No data available for analytics. Load data from Google Sheets or generate leads.")
-        return
-
-    # Time-based analysis
-    st.markdown("### 📈 Activity Over Time")
-    if not chat_df.empty and 'parsed_time' in chat_df.columns:
-        chat_df['date'] = chat_df['parsed_time'].dt.date
-        daily_activity = chat_df.groupby('date').size().reset_index(name='message_count')
-        fig = px.line(daily_activity, x='date', y='message_count', title='Daily Message Activity')
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(255,255,255,0.95)',
-                          font=dict(family='Inter', size=12), title_font_size=20, title_font_color='#667eea')
-        st.plotly_chart(fig, use_container_width=True)
-
-    # Lead status distribution
-    if not outreach_df.empty and 'status' in outreach_df.columns:
-        st.markdown("### 🎯 Lead Status Distribution")
-        status_counts = outreach_df['status'].value_counts().reset_index()
-        status_counts.columns = ['status', 'count']
-        fig = px.pie(status_counts, values='count', names='status', title='Lead Status Breakdown',
-                     color_discrete_sequence=px.colors.sequential.RdBu)
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(255,255,255,0.95)',
-                          font=dict(family='Inter', size=12), title_font_size=20, title_font_color='#667eea')
-        st.plotly_chart(fig, use_container_width=True)
-
-    # Company distribution
-    if not outreach_df.empty and 'company_name' in outreach_df.columns:
-        st.markdown("### 🏢 Top Companies")
-        
-        company_counts = outreach_df['company_name'].value_counts().head(10)
-        
-        fig = px.bar(x=company_counts.index, y=company_counts.values,
-                    title='Top 10 Companies',
-                    labels={'x': 'Company', 'y': 'Number of Leads'})
-        fig.update_traces(marker_color='#764ba2')
-        fig.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(255,255,255,0.95)',
-            font=dict(family='Inter', size=12),
-            title_font_size=20,
-            title_font_color='#667eea'
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-    # Response rate analysis
-    if not chat_df.empty:
-        st.markdown("### 💬 Response Analysis")
-        
-        sent_messages = len(chat_df[chat_df.apply(
-            lambda row: is_me(row.get('sender_name'), row.get('sender_url'), MY_PROFILE), axis=1
-        )])
-        received_messages = len(chat_df) - sent_messages
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("📤 Messages Sent", sent_messages)
-        with col2:
-            st.metric("📥 Messages Received", received_messages)
-        with col3:
-            response_rate = round((received_messages / sent_messages * 100), 2) if sent_messages > 0 else 0
-            st.metric("📊 Response Rate", f"{response_rate}%")
-
-# ==================== EMAIL QUEUE MANAGER ==================== #
-def show_email_queue():
-    """Display and manage email queue"""
-    st.markdown("<div class='section-header'>📧 Email Queue Manager</div>", unsafe_allow_html=True)
-    
-    if not st.session_state.email_queue:
-        st.markdown("""
-        <div style='background: rgba(255, 255, 255, 0.95); padding: 4rem; border-radius: 25px; 
-                    text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.15);'>
-            <h2 style='color: #667eea; font-size: 3rem; margin-bottom: 1rem;'>📧</h2>
-            <h3 style='color: #2d3748; margin-bottom: 1rem;'>Email Queue is Empty</h3>
-            <p style='color: #666; font-size: 1.1rem;'>Queue emails from the CRM dashboard</p>
-        </div>
-        """, unsafe_allow_html=True)
-        return
-    
-    st.markdown(f"""
-    <div class='stat-box'>
-        <div class='metric-icon'>📧</div>
-        <div class='stat-number'>{len(st.session_state.email_queue)}</div>
-        <div class='stat-label'>Queued Emails</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    for idx, email in enumerate(st.session_state.email_queue):
-        st.markdown(f"""
-        <div class='email-card'>
-            <h3 class='lead-title'>To: {email['to']}</h3>
-            <p class='lead-sub'><strong>Subject:</strong> {email['subject']}</p>
-            <div class='lead-msg'>
-                {email['body']}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("✅ Send Now", key=f"send_email_{idx}", use_container_width=True):
-                st.success(f"✅ Email sent to {email['to']}!")
-                st.session_state.email_queue.pop(idx)
-                st.rerun()
-        with col2:
-            if st.button("✏️ Edit", key=f"edit_email_{idx}", use_container_width=True):
-                st.info("✏️ Edit feature coming soon!")
-        with col3:
-            if st.button("🗑️ Delete", key=f"delete_email_{idx}", use_container_width=True):
-                st.session_state.email_queue.pop(idx)
-                st.rerun()
-
-# ==================== WEBHOOK MONITOR ==================== #
-def show_webhook_monitor():
-    """Monitor webhook activity and test connections"""
-    st.markdown("<div class='section-header'>🔗 Webhook Monitor</div>", unsafe_allow_html=True)
-    
-    st.markdown(f"""
-    <div class='crm-card'>
-        <h3 style='color: #667eea; margin-bottom: 1rem;'>📡 Webhook Configuration</h3>
-        <p style='color: #666;'><strong>Endpoint:</strong> {WEBHOOK_URL}</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Test webhook
-    st.markdown("### 🧪 Test Webhook Connection")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        test_action = st.selectbox("Select Test Action", 
-                                   ['ping', 'search_leads', 'send_message', 'get_status'], key='webhook_test_action')
-    
-    with col2:
-        if st.button("🚀 Send Test Request", use_container_width=True, key='send_test_webhook_btn'):
-            with st.spinner("Sending test request..."):
-                test_payload = {
-                    'action': test_action,
-                    'test': True,
-                    'timestamp': datetime.now().isoformat()
-                }
+                    
+            with tab_actions:
+                st.subheader("Update Lead Status")
                 
-                success, response = send_webhook_request(WEBHOOK_URL, test_payload)
+                current_status = selected_lead['Status']
+                new_status = st.selectbox(
+                    "Select New Status", 
+                    ['Connected', 'Sent', 'Pending', 'Replied', 'Converted', 'Ready'],
+                    index=['Connected', 'Sent', 'Pending', 'Replied', 'Converted', 'Ready'].index(current_status)
+                )
                 
-                if success:
-                    st.success("✅ Webhook test successful!")
-                    st.session_state.webhook_history.append({
-                        'timestamp': datetime.now(),
-                        'action': test_action,
-                        'status': 'success',
-                        'response': response
-                    })
-                else:
-                    st.error(f"❌ Webhook test failed: {response}")
-                    st.session_state.webhook_history.append({
-                        'timestamp': datetime.now(),
-                        'action': test_action,
-                        'status': 'failed',
-                        'response': response
-                    })
+                if st.button("Update Status and Send Webhook", use_container_width=True):
+                    if new_status != current_status:
+                        update_lead_status(st.session_state.selected_contact, new_status)
+                        st.rerun()
+                    else:
+                        st.warning("Status is already set to this value.")
+                        
+                st.subheader("Manual Webhook Test")
+                if st.button("Send Test Webhook for this Lead", use_container_width=True):
+                    payload = create_lead_payload(selected_lead)
+                    send_webhook_payload(payload)
+                    
+        else:
+            st.info("Select a lead from the list to view the conversation and details.")
+
+def render_daily_tracker():
+    """Renders the daily activity tracker page."""
     
-    # Webhook history
-    st.markdown("### 📜 Webhook History")
+    st.markdown('<p class="sub-title">Track Your Daily Outreach Goals and Progress</p>', unsafe_allow_html=True)
     
-    if st.session_state.webhook_history:
-        for entry in reversed(st.session_state.webhook_history[-20:]):
-            status_class = 'status-success' if entry['status'] == 'success' else 'status-error'
-            status_icon = '✅' if entry['status'] == 'success' else '❌'
-            
+    # --- Daily Goals Configuration ---
+    st.subheader("Daily Goals")
+    
+    # Define default goals (can be moved to st.session_state for persistence)
+    daily_goals = {
+        'Connections_Sent': 20,
+        'Messages_Sent': 50,
+        'Follow_ups_Sent': 15,
+        'Responses_Received': 5,
+        'Leads_Converted': 1
+    }
+    
+    # Display goals in an expander for editing
+    with st.expander("Edit Daily Goals", expanded=False):
+        col_g1, col_g2, col_g3, col_g4, col_g5 = st.columns(5)
+        
+        daily_goals['Connections_Sent'] = col_g1.number_input("Connections Sent Goal", min_value=0, value=daily_goals['Connections_Sent'], step=1)
+        daily_goals['Messages_Sent'] = col_g2.number_input("Messages Sent Goal", min_value=0, value=daily_goals['Messages_Sent'], step=1)
+        daily_goals['Follow_ups_Sent'] = col_g3.number_input("Follow-ups Sent Goal", min_value=0, value=daily_goals['Follow_ups_Sent'], step=1)
+        daily_goals['Responses_Received'] = col_g4.number_input("Responses Received Goal", min_value=0, value=daily_goals['Responses_Received'], step=1)
+        daily_goals['Leads_Converted'] = col_g5.number_input("Leads Converted Goal", min_value=0, value=daily_goals['Leads_Converted'], step=1)
+        
+    # --- Today's Progress ---
+    st.subheader("Today's Progress")
+    
+    if st.session_state.daily_tracker.empty:
+        st.warning("Daily tracker data is empty. Cannot calculate today's progress.")
+        return
+        
+    progress = get_daily_goal_progress(st.session_state.daily_tracker, daily_goals)
+    
+    cols_p = st.columns(5)
+    
+    for i, (metric, data) in enumerate(progress.items()):
+        with cols_p[i]:
             st.markdown(f"""
-            <div class='message-card-all'>
-                <div style='display: flex; justify-content: space-between; align-items: start;'>
-                    <div style='flex: 1;'>
-                        <div style='display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;'>
-                            <span class='status-badge {status_class}'>{status_icon} {entry['status'].upper()}</span>
-                            <strong style='color: #667eea;'>{entry['action']}</strong>
-                        </div>
-                        <p style='color: #666; margin: 0.5rem 0; font-size: 0.9rem;'>
-                            Response: {entry['response'][:100]}{'...' if len(str(entry['response'])) > 100 else ''}
-                        </p>
-                    </div>
-                    <span style='color: #999; font-size: 0.85rem; white-space: nowrap;'>
-                        {entry['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}
-                    </span>
-                </div>
+            <div class="metric-card" style="padding: 1.5rem;">
+                <div style="font-weight: 700; color: #333; font-size: 1.1rem; margin-bottom: 0.5rem;">{metric.replace('_', ' ')}</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #667eea;">{data['current']} / {data['goal']}</div>
             </div>
             """, unsafe_allow_html=True)
-    else:
-        st.info("No webhook history yet. Send a test request to get started!")
+            st.progress(data['percent'] / 100)
+            
+    st.markdown("---")
+    
+    # --- Daily Activity Table ---
+    st.subheader("Daily Activity Log")
+    
+    # Display the daily tracker data
+    st.dataframe(
+        st.session_state.daily_tracker.sort_values(by='Date', ascending=False), 
+        use_container_width=True,
+        height=400
+    )
+    
+    # --- Data Export ---
+    csv = st.session_state.daily_tracker.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download Daily Tracker Data as CSV",
+        data=csv,
+        file_name='daily_tracker_export.csv',
+        mime='text/csv',
+        use_container_width=True
+    )
 
-# ==================== SETTINGS ==================== #
-def show_settings():
-    """Application settings and configuration"""
-    st.markdown("<div class='section-header'>⚙️ Settings & Configuration</div>", unsafe_allow_html=True)
+def render_integrations_logs():
+    """Renders the integrations and activity logs page."""
     
-    # General Settings
-    st.markdown("### 🎛️ General Settings")
+    st.markdown('<p class="sub-title">Monitor Webhook Activity and Application Logs</p>', unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    tab_webhook, tab_logs = st.tabs(["Webhook History", "Activity Log"])
     
-    with col1:
-        st.session_state.show_notifications = st.checkbox(
-            "🔔 Show Notifications",
-            value=st.session_state.show_notifications,
-            key='setting_show_notifications'
-        )
+    with tab_webhook:
+        st.subheader("Webhook Integration Test")
         
-        st.session_state.auto_refresh = st.checkbox(
-            "🔄 Auto Refresh Data",
-            value=st.session_state.auto_refresh,
-            key='setting_auto_refresh'
-        )
-    
-    with col2:
-        st.session_state.dark_mode = st.checkbox(
-            "🌙 Dark Mode (Coming Soon)",
-            value=st.session_state.dark_mode,
-            disabled=True,
-            key='setting_dark_mode'
-        )
+        col_url, col_test = st.columns([3, 1])
+        col_url.text_input("Webhook URL", WEBHOOK_URL, disabled=True)
         
-        if st.session_state.auto_refresh:
-            st.session_state.refresh_interval = st.slider(
-                "Refresh Interval (seconds)",
-                min_value=30,
-                max_value=300,
-                value=st.session_state.refresh_interval,
-                step=30,
-                key='setting_refresh_interval'
+        with st.expander("Edit Test Payload", expanded=False):
+            st.session_state.webhook_test_payload = st.text_area(
+                "JSON Payload", 
+                st.session_state.webhook_test_payload, 
+                height=200
             )
-    
-    # Data Management
-    st.markdown("### 💾 Data Management")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        if st.button("🔄 Refresh All Data", use_container_width=True, key='setting_refresh_all_data_btn'):
-            st.cache_data.clear()
-            st.success("✅ Data refreshed!")
-            st.rerun()
-    
-    with col2:
-        if st.button("🗑️ Clear Cache", use_container_width=True, key='setting_clear_cache_btn'):
-            st.cache_data.clear()
-            st.cache_resource.clear()
-            st.success("✅ Cache cleared!")
-            st.rerun() # Rerun to ensure all cached data is reloaded
-    
-    with col3:
-        if st.button("📥 Export All Data", use_container_width=True, key='setting_export_all_data_btn'):
-            st.info("📥 Export feature coming soon!")
-    
-    # Account Information
-    st.markdown("### 👤 Account Information")
-    
-    st.markdown(f"""
-    <div class='crm-card'>
-        <p><strong>Profile Name:</strong> {MY_PROFILE['name']}</p>
-        <p><strong>LinkedIn URL:</strong> <a href="{MY_PROFILE['url']}" target="_blank">{MY_PROFILE['url']}</a></p>
-        <p><strong>Last Refresh:</strong> {st.session_state.last_refresh.strftime('%Y-%m-%d %H:%M:%S')}</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Advanced Settings
-    with st.expander("🔧 Advanced Settings"):
-        st.markdown("#### API Configuration")
+            
+        if col_test.button("Send Custom Test Webhook", use_container_width=True):
+            try:
+                payload = json.loads(st.session_state.webhook_test_payload)
+                send_webhook_payload(payload)
+            except json.JSONDecodeError:
+                st.error("Invalid JSON payload.")
+            
+        st.markdown("---")
+        st.subheader("Recent Webhook Transactions")
         
-        webhook_url_custom = st.text_input("Webhook URL", value=WEBHOOK_URL, key='setting_webhook_url_input')
+        if st.session_state.webhook_history:
+            # Convert history to DataFrame for easy display
+            webhook_df = pd.DataFrame(st.session_state.webhook_history).sort_values(by='timestamp', ascending=False)
+            st.dataframe(webhook_df, use_container_width=True)
+        else:
+            st.info("No webhook transactions recorded yet.")
+            
+    with tab_logs:
+        st.subheader("Application Activity Log")
         
-        if st.button("💾 Save Webhook URL", key='setting_save_webhook_url_btn'):
-            # In a real app, you would save this to a persistent config
-            st.success("✅ Webhook URL saved (for this session)!")
-        
-        st.markdown("#### Data Retention")
-        retention_days = st.slider("Keep data for (days)", 30, 365, 90, key='setting_data_retention_slider')
-        
-        st.markdown("#### Export Format")
-        export_format = st.selectbox("Default Export Format", ['CSV', 'Excel', 'JSON', 'PDF'], key='setting_export_format_select')
+        if st.session_state.activity_log:
+            # Display log in reverse chronological order
+            log_text = "\n".join(st.session_state.activity_log[::-1])
+            st.text_area("Log Entries", log_text, height=500)
+        else:
+            st.info("No activity logged yet.")
 
-# ==================== MAIN APPLICATION ==================== #
-def main():
-    """Main application logic"""
-    
-    # Check authentication
-    if not st.session_state.authenticated:
-        authenticate_user()
-        return
-    
-    # Load all data
-    client = st.session_state.gsheets_client
-    
-    with st.spinner("📊 Loading all data..."):
-        chat_df = load_sheet_data(client, CHAT_SPREADSHEET_ID, CHAT_SHEET_NAME)
-        outreach_df = load_sheet_data(client, OUTREACH_SPREADSHEET_ID, OUTREACH_SHEET_NAME)
-        daily_tracker = load_daily_tracker()
-        leads_database = load_leads_database()
-        
-        st.session_state.chat_df = chat_df
-        st.session_state.outreach_df = outreach_df
-        st.session_state.daily_tracker = daily_tracker
-        st.session_state.leads_database = leads_database
-        st.session_state.last_refresh = datetime.utcnow()
-    
-    # Calculate metrics
-    metrics = calculate_metrics(chat_df, outreach_df, daily_tracker)
-    
-    # Sidebar Navigation
-    with st.sidebar:
-        st.markdown("""
-        <div style='text-align: center; padding: 2rem 0;'>
-            <h1 style='color: #667eea; font-size: 2rem; font-weight: 900;'>🚀 LinkedIn Hub</h1>
-            <p style='color: #666; font-size: 0.9rem;'>Analytics & Outreach Platform</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("---")
-        
-        page = st.radio(
-            "📍 Navigation",
-            [
-                "🏠 Dashboard",
-                "💬 Conversations",
-                "📋 CRM",
-                "🔍 Search & Send",
-                "📊 Analytics",
-                "📧 Email Queue",
-                "🔗 Webhook Monitor",
-                "⚙️ Settings"
-            ],
-            label_visibility="collapsed",
-            key='sidebar_navigation'
-        )
-        st.session_state.current_page = page # Update current page in session state
-        
-        st.markdown("---")
-        
-        # Quick Stats in Sidebar
-        st.markdown("### 📊 Quick Stats")
-        st.metric("Total Leads", metrics['total_leads'])
-        st.metric("Response Rate", f"{metrics['response_rate']}%" if metrics['response_rate'] else "0%")
-        st.metric("Conversion", f"{metrics['conversion_rate']}%" if metrics['conversion_rate'] else "0%")
-        
-        st.markdown("---")
-        
-        # Quick Actions
-        st.markdown("### ⚡ Quick Actions")
-        if st.button("🔄 Refresh Data", use_container_width=True, key='sidebar_refresh_btn'):
-            st.cache_data.clear()
-            st.rerun()
-        
-        if st.button("🚪 Logout", use_container_width=True, key='sidebar_logout_btn'):
-            st.session_state.authenticated = False
-            st.rerun()
-        
-        st.markdown("---")
-        
-        # Footer
-        st.markdown(f"""
-        <div style='text-align: center; padding: 1rem; color: #999; font-size: 0.8rem;'>
-            <p>Last updated:<br>{st.session_state.last_refresh.strftime('%Y-%m-%d %H:%M:%S')}</p>
-            <p style='margin-top: 1rem;'>Made with ❤️ by Donmenico Hudson</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Main Content Area - Render based on selected page
-    if st.session_state.current_page == "🏠 Dashboard":
-        show_dashboard_overview(metrics, daily_tracker)
-    
-    elif st.session_state.current_page == "💬 Conversations":
-        show_conversation_history(chat_df)
-    
-    elif st.session_state.current_page == "📋 CRM":
-        show_crm_dashboard(outreach_df)
-    
-    elif st.session_state.current_page == "🔍 Search & Send":
-        show_search_interface(WEBHOOK_URL)
-    
-    elif st.session_state.current_page == "📊 Analytics":
-        show_analytics(chat_df, outreach_df)
-    
-    elif st.session_state.current_page == "📧 Email Queue":
-        show_email_queue()
-    
-    elif st.session_state.current_page == "🔗 Webhook Monitor":
-        show_webhook_monitor()
-    
-    elif st.session_state.current_page == "⚙️ Settings":
-        show_settings()
+# ==================== RUN APP ==================== #
 
-# ==================== RUN APPLICATION ==================== #
 if __name__ == "__main__":
-    main()
-
+    main_app()
