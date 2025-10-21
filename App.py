@@ -586,7 +586,13 @@ def load_sheet_data(_client, sheet_id, sheet_name):
     """Load data from Google Sheets with caching"""
     try:
         spreadsheet = _client.open_by_key(sheet_id)
-        worksheet = spreadsheet.worksheet(sheet_name)
+        try:
+            worksheet = spreadsheet.worksheet(sheet_name)
+        except gspread.exceptions.WorksheetNotFound:
+            # If sheet_name is actually a CSV file name, try to find a sheet with a similar name or the first sheet
+            st.warning(f"Worksheet '{sheet_name}' not found. Attempting to load the first worksheet.")
+            worksheet = spreadsheet.sheet1
+
         data = worksheet.get_all_records()
         return pd.DataFrame(data)
     except Exception as e:
@@ -600,13 +606,22 @@ def load_daily_tracker():
     if client:
         try:
             spreadsheet = client.open_by_key(DAILY_TRACKER_SHEET_ID)
-            worksheet = spreadsheet.worksheet(DAILY_TRACKER_SHEET_NAME)
+            try:
+                worksheet = spreadsheet.worksheet(DAILY_TRACKER_SHEET_NAME)
+            except gspread.exceptions.WorksheetNotFound:
+                st.warning(f"Daily tracker worksheet \'{DAILY_TRACKER_SHEET_NAME}\' not found. Attempting to load the first worksheet.")
+                worksheet = spreadsheet.sheet1 # Fallback to the first sheet
+
             data = worksheet.get_all_records()
             df = pd.DataFrame(data)
             # Ensure numeric types for calculations
-            for col in ['Connections_Sent', 'Messages_Sent', 'Follow_ups_Sent', 'Responses_Received', 'Leads_Converted']:
+            for col in [\'Connections_Sent\', \'Messages_Sent\', \'Follow_ups_Sent\', \'Responses_Received\', \'Leads_Converted\']:
                 if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+                    df[col] = pd.to_numeric(df[col], errors=\'coerce\').fillna(0).astype(int)
+            
+            # Ensure 'Date' column is in datetime format for filtering
+            if 'Date' in df.columns:
+                df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.strftime("%Y-%m-%d")
             return df
         except Exception as e:
             st.error(f"🔴 Error loading daily tracker: {e}")
@@ -614,29 +629,22 @@ def load_daily_tracker():
 
 @st.cache_data(ttl=60)
 def load_leads_database():
-    """Load leads database from Google Sheets"""
+    """Load leads database from Google Sheets (CRM data)"""
     client = st.session_state.gsheets_client
     if client:
         try:
-            spreadsheet = client.open_by_key(LEADS_DATABASE_SHEET_ID)
-            # Attempt to open by GID first, then by name if GID fails or is not provided
-            worksheet = None
-            if LEADS_SHEET_GID:
-                try:
-                    worksheet = spreadsheet.get_worksheet_by_id(int(LEADS_SHEET_GID))
-                except gspread.exceptions.WorksheetNotFound:
-                    st.warning(f"Worksheet with GID {LEADS_SHEET_GID} not found. Trying by name.")
-            if not worksheet:
-                worksheet = spreadsheet.worksheet("Leads") # Assuming a default worksheet name if GID fails
-
+            spreadsheet = client.open_by_key(OUTREACH_SPREADSHEET_ID)
+            worksheet = spreadsheet.worksheet(OUTREACH_SHEET_NAME)
             data = worksheet.get_all_records()
             df = pd.DataFrame(data)
             # Convert 'timestamp' column to datetime objects
             if 'timestamp' in df.columns:
                 df['parsed_time'] = df['timestamp'].apply(parse_timestamp)
+            else:
+                df['parsed_time'] = pd.NaT # Add NaT if timestamp column is missing
             return df
         except Exception as e:
-            st.error(f"🔴 Error loading leads database: {e}")
+            st.error(f"🔴 Error loading leads database (CRM): {e}")
     return pd.DataFrame()
 
 def parse_timestamp(timestamp_str):
@@ -737,6 +745,10 @@ def calculate_metrics(chat_df, outreach_df, daily_tracker_df):
     }
     
     if not chat_df.empty:
+        # Ensure 'timestamp' column exists before processing
+        if 'timestamp' not in chat_df.columns:
+            chat_df['timestamp'] = pd.NaT # Add a NaT column if missing
+
         is_my_message = chat_df.apply(
             lambda row: is_me(row.get('sender_name'), row.get('sender_url'), MY_PROFILE), axis=1
         ).astype(bool)
@@ -745,7 +757,7 @@ def calculate_metrics(chat_df, outreach_df, daily_tracker_df):
         
         if metrics['messages_sent'] > 0:
             metrics['response_rate'] = round((metrics['messages_received'] / metrics['messages_sent']) * 100, 2)
-    
+
     if not outreach_df.empty:
         if 'status' in outreach_df.columns:
             metrics['pending_leads'] = len(outreach_df[outreach_df['status'] == 'pending'])
@@ -952,17 +964,21 @@ def show_conversation_history(chat_df):
         st.info("No chat history available.")
         return
 
+    # Ensure 'timestamp' column exists before processing
+    if 'timestamp' not in chat_df.columns:
+        st.warning("The 'timestamp' column is missing from the chat data. Displaying without time-based filtering/sorting.")
+        chat_df['timestamp'] = pd.NaT # Add a NaT column if missing
+    
     # Pre-process chat_df for display
-    chat_df['is_me'] = chat_df.apply(lambda row: is_me(row.get('sender_name'), row.get('sender_url'), MY_PROFILE), axis=1)
-    chat_df['display_name'] = chat_df.apply(lambda row: MY_PROFILE['name'] if row['is_me'] else row.get('sender_name', 'Unknown'), axis=1)
-    chat_df['initials'] = chat_df['display_name'].apply(get_initials)
-    chat_df['message_type'] = chat_df['is_me'].apply(lambda x: 'sent' if x else 'received')
-    chat_df['parsed_time'] = chat_df['timestamp'].apply(parse_timestamp)
+    chat_df["is_me"] = chat_df.apply(lambda row: is_me(row.get("sender_name"), row.get("sender_url"), MY_PROFILE), axis=1)
+    chat_df["display_name"] = chat_df.apply(lambda row: MY_PROFILE["name"] if row["is_me"] else row.get("sender_name", "Unknown"), axis=1)
+    chat_df["initials"] = chat_df["display_name"].apply(get_initials)
+    chat_df["message_type"] = chat_df["is_me"].apply(lambda x: "sent" if x else "received")
+    chat_df["parsed_time"] = chat_df["timestamp"].apply(parse_timestamp)
 
-    # Sort by timestamp
-    chat_df = chat_df.sort_values(by='parsed_time', ascending=False).reset_index(drop=True)
-
-    # Filters
+    # Sort by timestamp if 'parsed_time' is valid
+    if not chat_df['parsed_time'].isnull().all():
+        chat_df = chat_df.sort_values(by="parsed_time", ascending=False).reset_index(drop=True)  # Filters
     col1, col2, col3 = st.columns([1,1,2])
     with col1:
         message_type_filter = st.selectbox("Filter by Type", ['All', 'Sent', 'Received'], key='chat_type_filter')
@@ -1030,9 +1046,31 @@ def show_crm_dashboard(outreach_df):
         'date_range': date_range_filter if isinstance(date_range_filter, int) else None,
         'search_query': search_query
     }
-    filtered_df = filter_dataframe(outreach_df, filters)
+    filtered_df = filter_dataframe(outreach_df, filters)    st.markdown(f"<p style=\'color: white; font-size: 1.1rem;\'>Displaying {len(filtered_df)} of {len(outreach_df)} leads</p>", unsafe_allow_html=True)
 
-    st.markdown(f"<p style='color: white; font-size: 1.1rem;'>Displaying {len(filtered_df)} of {len(outreach_df)} leads</p>", unsafe_allow_html=True)
+    # Editable DataFrame
+    st.markdown("### ✍️ Edit Leads Data")
+    edited_df = st.data_editor(filtered_df, num_rows="dynamic", use_container_width=True, key="crm_data_editor")
+
+    if st.button("💾 Save Edited Leads to Google Sheet", key="save_edited_leads", type="primary"):
+        if not edited_df.equals(filtered_df): # Only save if changes were made
+            try:
+                client = st.session_state.gsheets_client
+                spreadsheet = client.open_by_key(OUTREACH_SPREADSHEET_ID)
+                worksheet = spreadsheet.worksheet(OUTREACH_SHEET_NAME)
+                
+                # Clear existing data and write the new data
+                worksheet.clear()
+                worksheet.update([edited_df.columns.values.tolist()] + edited_df.values.tolist())
+                st.success("✅ Leads data saved successfully to Google Sheet!")
+                st.cache_data.clear()
+                st.rerun()
+            except Exception as e:
+                st.error(f"❌ Error saving data to Google Sheet: {e}")
+        else:
+            st.info("No changes detected to save.")
+
+
 
     # Stats for CRM
     total_leads = len(filtered_df)
@@ -1095,9 +1133,50 @@ def show_crm_dashboard(outreach_df):
         if st.button("📊 Generate Report", use_container_width=True, key='crm_generate_report_btn'):
             st.info("📊 Report generation feature coming soon!")
 
-    # Lead Cards
-    st.markdown("<br>", unsafe_allow_html=True)
-    for idx, (i, row) in enumerate(filtered_df.iterrows()):
+    # Lead Cards (Display only, editing handled by st.data_editor above)
+    # st.markdown("<br>", unsafe_allow_html=True)
+    # for idx, (i, row) in enumerate(filtered_df.iterrows()):
+    #     with st.container():
+    #         linkedin_url = row.get(\'linkedin_url\', \'#\')
+    #         profile_name = row.get(\'profile_name\', \'Unknown\')
+    #         tagline = row.get(\'profile_tagline\', \'N/A\')
+    #         message = row.get(\'linkedin_message\', \'No message available\')
+    #         timestamp = row.get(\'timestamp\', \'N/A\')
+    #         location = row.get(\'profile_location\', \'N/A\')
+    #         company = row.get(\'company_name\', \'N/A\')
+    #         status = row.get(\'status\', \'unknown\')
+            
+    #         # Status badge
+    #         status_class = {
+    #             \'sent\': \'status-sent\',
+    #             \'pending\': \'status-pending\',
+    #             \'ready_to_send\': \'status-ready\',
+    #             \'responded\': \'status-success\'
+    #         }.get(status, \'status-pending\')
+            
+    #         # Check if favorited
+    #         lead_id = generate_lead_id(profile_name, linkedin_url)
+    #         is_favorited = lead_id in st.session_state.favorites
+    #         has_notes = lead_id in st.session_state.notes
+    #         lead_tags = st.session_state.tags.get(lead_id, [])
+            
+    #         st.markdown(f\"\"\"
+    #         <div class=\"lead-card\">\n                <div style=\"display: flex; align-items: start; gap: 1.5rem; margin-bottom: 1rem;\">\n                    <div class=\"profile-badge\">{get_initials(profile_name)}</div>\n                    <div style=\"flex: 1;\">\n                        <div style=\"display: flex; justify-content: space-between; align-items: start;\">\n                            <div>\n                                <h3 class=\"lead-title\">{profile_name}</h3>\n                                <p class=\"lead-sub\">💼 {tagline}</p>\n                            </div>\n                            <span class=\"status-badge {status_class}\">{status.replace(\'_\', \' \').title()}</span>\n                        </div>\n                        <div style=\"display: flex; gap: 2rem; margin: 1rem 0; flex-wrap: wrap;\">\n                            <span style=\"color: #666;\">📍 {location}</span>\n                            <span style=\"color: #666;\">🏢 {company}</span>\n                            <span style=\"color: #666;\">🕐 {timestamp}</span>\n                        </div>\n                        {\"<div style=\'margin: 0.5rem 0;\'>\" + \".\".join([f\"<span class=\'tag-badge\'>{tag}</span>\" for tag in lead_tags]) + \"</div>\" if lead_tags else \"\"}\n                    </div>\n                </div>\n                \n                <div class=\"lead-msg\">\n                    <strong style=\"color: #667eea; font-size: 1.1rem;\">📩 Outreach Message:</strong><br><br>\n                    {message}\n                </div>\n            \"\"\", unsafe_allow_html=True)
+            
+    #         # Display notes if any
+    #         if has_notes:
+    #             st.markdown(f\"\"\"
+    #             <div class=\"note-card\">\n                    <strong>📝 Note:</strong> {st.session_state.notes[lead_id]}\n                </div>\n                \"\"\", unsafe_allow_html=True)
+            
+    #         st.markdown(\"<div class=\'action-buttons\'>\", unsafe_allow_html=True)
+    #         st.markdown(f\"\"\"
+    #             <a href=\"{linkedin_url}\" target=\"_blank\" class=\"action-btn\">\n                    🔗 View LinkedIn Profile\n                </a>\n            \"\"\", unsafe_allow_html=True)
+            
+    #         # Action buttons for each lead
+    #         col_btn1, col_btn2, col_btn3, col_btn4, col_btn5 = st.columns(5)
+            
+    #         with col_btn1:
+    #             if st.button(\"✉️ Send Message\", key=f\"crm_lead_send_{i}_{idx}\", use_container_width=True):
         with st.container():
             linkedin_url = row.get('linkedin_url', '#')
             profile_name = row.get('profile_name', 'Unknown')
