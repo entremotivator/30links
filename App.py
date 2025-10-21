@@ -130,6 +130,7 @@ def load_daily_tracker():
 # Load leads database
 @st.cache_data(ttl=60)
 def load_leads_database():
+    """Load leads database from linkedin-tracking-csv.csv sheet"""
     try:
         # Try loading by GID first (for linkedin-tracking-csv.csv sheet)
         df = get_sheet_by_gid(LEADS_DATABASE_SHEET_ID, LEADS_SHEET_GID)
@@ -138,19 +139,34 @@ def load_leads_database():
             # Clean column names
             df.columns = df.columns.str.strip()
             
-            # Parse success column if it exists
-            if 'success' in df.columns:
-                df['success'] = df['success'].astype(str).str.lower().isin(['true', 'yes', '1'])
+            # Define expected columns from linkedin-tracking-csv.csv
+            expected_columns = [
+                'timestamp', 'profile_name', 'profile_location', 'profile_tagline',
+                'linkedin_url', 'linkedin_subject', 'linkedin_message',
+                'email_subject', 'email_message', 'outreach_strategy',
+                'personalization_points', 'follow_up_suggestions', 'connection_status',
+                'browserflow_session', 'success', 'credits_used', 'error_message',
+                'status', 'search_term', 'search_city', 'search_country',
+                'name', 'image_url', 'tagline', 'location', 'summary'
+            ]
             
-            # Parse timestamp column if it exists
+            # Keep only columns that exist in both expected and actual dataframe
+            available_columns = [col for col in expected_columns if col in df.columns]
+            
+            if available_columns:
+                df = df[available_columns]
+            
+            # Parse success column - TRUE means initial message sent or connection made
+            if 'success' in df.columns:
+                df['success'] = df['success'].astype(str).str.lower().isin(['true', 'yes', '1', 't'])
+            
+            # Parse timestamp column
             if 'timestamp' in df.columns:
                 df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
             
-            # Parse other potential date columns
-            date_columns = [col for col in df.columns if 'date' in col.lower() or 'time' in col.lower()]
-            for col in date_columns:
-                if col != 'timestamp':
-                    df[col] = pd.to_datetime(df[col], errors='coerce')
+            # Parse credits_used as numeric
+            if 'credits_used' in df.columns:
+                df['credits_used'] = pd.to_numeric(df['credits_used'], errors='coerce').fillna(0)
             
             return df
         
@@ -543,44 +559,188 @@ with tab2:
 
 # TAB 3: LEADS DATABASE
 with tab3:
-    st.markdown("## 👥 Leads Database Management")
+    st.markdown("## 👥 Leads CRM - From Google Sheets")
+    st.caption("Data from linkedin-tracking-csv.csv sheet")
     
-    with st.expander("➕ Add New Lead", expanded=False):
-        col1, col2 = st.columns(2)
-        with col1:
-            new_name = st.text_input("Name")
-            new_linkedin = st.text_input("LinkedIn URL")
-            new_status = st.selectbox("Status", ["Pending", "Accepted", "Declined"])
-        with col2:
-            new_stage = st.selectbox("Stage", [
-                "Connection Sent", "Connection Accepted", "Initial Message Sent",
-                "Interested in AI Systems", "Link Sent", "Follow-up 1", "Follow-up 2",
-                "Follow-up 3", "Follow-up 4", "Converted", "Not Interested"
-            ])
-            new_notes = st.text_area("Notes")
+    # Display leads from Google Sheets
+    if leads_df is not None and not leads_df.empty:
+        st.success(f"✅ Loaded {len(leads_df)} leads from Google Sheets")
         
-        if st.button("➕ Add Lead"):
-            if new_name and new_linkedin:
-                new_lead = pd.DataFrame({
-                    'Name': [new_name], 'LinkedIn_URL': [new_linkedin],
-                    'Date_Connected': [datetime.now().strftime("%Y-%m-%d")],
-                    'Connection_Status': [new_status], 'Stage': [new_stage],
-                    'Initial_Message_Sent': [False], 'Interested': [False],
-                    'Link_Sent_Date': [''], 'Follow_Up_1_Date': [''],
-                    'Follow_Up_2_Date': [''], 'Follow_Up_3_Date': [''],
-                    'Follow_Up_4_Date': [''], 'Converted': [False], 'Notes': [new_notes]
-                })
-                st.session_state.leads_database = pd.concat([st.session_state.leads_database, new_lead], ignore_index=True)
-                st.success(f"✅ Added {new_name}!")
-                st.rerun()
+        # Summary metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Leads", f"{len(leads_df):,}")
+        
+        with col2:
+            if 'success' in leads_df.columns:
+                successful = leads_df[leads_df['success'] == True].shape[0]
+                success_rate = (successful / len(leads_df) * 100) if len(leads_df) > 0 else 0
+                st.metric("Successful Outreach", successful)
+                st.caption(f"✅ {success_rate:.1f}% success rate")
+        
+        with col3:
+            if 'connection_status' in leads_df.columns:
+                connected = leads_df[leads_df['connection_status'].notna()].shape[0]
+                st.metric("With Status", connected)
+        
+        with col4:
+            if 'timestamp' in leads_df.columns:
+                today_leads = leads_df[leads_df['timestamp'].dt.date == datetime.now().date()]
+                st.metric("Today's Leads", len(today_leads))
+        
+        st.markdown("---")
+        
+        # Filter options
+        st.markdown("### 🔍 Filter & Search")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            # Success filter
+            success_filter = st.selectbox("Success Status", 
+                ["All", "Successful Only", "Pending"], 
+                key="success_filter")
+        
+        with col2:
+            # Connection status filter
+            if 'connection_status' in leads_df.columns:
+                status_options = ["All"] + list(leads_df['connection_status'].dropna().unique())
+                status_filter = st.selectbox("Connection Status", status_options)
+            else:
+                status_filter = "All"
+        
+        with col3:
+            # Search term filter
+            if 'search_term' in leads_df.columns:
+                search_terms = ["All"] + list(leads_df['search_term'].dropna().unique())
+                search_filter = st.selectbox("Search Term", search_terms)
+            else:
+                search_filter = "All"
+        
+        # Apply filters
+        filtered_df = leads_df.copy()
+        
+        if success_filter == "Successful Only" and 'success' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['success'] == True]
+        elif success_filter == "Pending" and 'success' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['success'] == False]
+        
+        if status_filter != "All" and 'connection_status' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['connection_status'] == status_filter]
+        
+        if search_filter != "All" and 'search_term' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['search_term'] == search_filter]
+        
+        st.info(f"📊 Showing {len(filtered_df)} of {len(leads_df)} leads")
+        
+        st.markdown("---")
+        
+        # Display priority columns
+        st.markdown("### 📋 Lead Records")
+        
+        # Define display columns priority
+        display_cols = []
+        priority_display = [
+            'timestamp', 'profile_name', 'name', 'profile_location', 'location',
+            'profile_tagline', 'tagline', 'linkedin_url', 'connection_status',
+            'success', 'search_term', 'outreach_strategy'
+        ]
+        
+        for col in priority_display:
+            if col in filtered_df.columns:
+                display_cols.append(col)
+        
+        if display_cols:
+            st.dataframe(
+                filtered_df[display_cols],
+                width="stretch",
+                height=500,
+                column_config={
+                    "timestamp": st.column_config.DatetimeColumn("Date/Time"),
+                    "profile_name": st.column_config.TextColumn("Name", width="medium"),
+                    "name": st.column_config.TextColumn("Name", width="medium"),
+                    "profile_location": st.column_config.TextColumn("Location", width="medium"),
+                    "location": st.column_config.TextColumn("Location", width="medium"),
+                    "linkedin_url": st.column_config.LinkColumn("LinkedIn Profile"),
+                    "connection_status": st.column_config.TextColumn("Status"),
+                    "success": st.column_config.CheckboxColumn("Success"),
+                    "search_term": st.column_config.TextColumn("Search Term"),
+                    "outreach_strategy": st.column_config.TextColumn("Strategy", width="large")
+                }
+            )
+        else:
+            st.dataframe(filtered_df, width="stretch", height=500)
+        
+        # Detailed view with all columns
+        with st.expander("🔍 View All Columns & Details"):
+            st.markdown("**All Available Columns:**")
+            
+            # Show columns in organized groups
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.markdown("**Profile Info:**")
+                profile_cols = ['timestamp', 'profile_name', 'name', 'profile_location', 
+                              'location', 'profile_tagline', 'tagline', 'image_url', 'summary']
+                for col in profile_cols:
+                    if col in filtered_df.columns:
+                        st.caption(f"• {col}")
+            
+            with col2:
+                st.markdown("**Outreach Info:**")
+                outreach_cols = ['linkedin_url', 'linkedin_subject', 'linkedin_message',
+                               'email_subject', 'email_message', 'outreach_strategy',
+                               'personalization_points', 'follow_up_suggestions']
+                for col in outreach_cols:
+                    if col in filtered_df.columns:
+                        st.caption(f"• {col}")
+            
+            with col3:
+                st.markdown("**Status Info:**")
+                status_cols = ['connection_status', 'success', 'status', 'browserflow_session',
+                             'credits_used', 'error_message', 'search_term', 'search_city', 
+                             'search_country']
+                for col in status_cols:
+                    if col in filtered_df.columns:
+                        st.caption(f"• {col}")
+            
+            st.markdown("---")
+            st.markdown("**Full Data Table:**")
+            st.dataframe(filtered_df, width="stretch", height=400)
+        
+        # Export filtered data
+        st.markdown("---")
+        csv_filtered = io.StringIO()
+        filtered_df.to_csv(csv_filtered, index=False)
+        st.download_button(
+            label=f"📥 Download Filtered Leads ({len(filtered_df)} records)",
+            data=csv_filtered.getvalue(),
+            file_name=f"filtered_leads_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+            mime="text/csv",
+            width="stretch"
+        )
     
-    st.markdown("---")
-    
-    if len(st.session_state.leads_database) > 0:
-        st.markdown("### Current Leads")
-        st.dataframe(st.session_state.leads_database, width="stretch", height=400)
     else:
-        st.info("No leads yet. Add your first lead above!")
+        st.warning("⚠️ No leads data loaded from Google Sheets")
+        st.info("📌 Click '⬇️ Load Sheets' button in the sidebar to fetch lead data")
+        
+        st.markdown("**Expected Sheet Details:**")
+        st.code(f"""
+Sheet ID: {LEADS_DATABASE_SHEET_ID}
+GID: {LEADS_SHEET_GID}
+Sheet Name: linkedin-tracking-csv.csv
+
+Expected Columns:
+• timestamp, profile_name, profile_location, profile_tagline
+• linkedin_url, linkedin_subject, linkedin_message
+• email_subject, email_message, outreach_strategy
+• personalization_points, follow_up_suggestions
+• connection_status, browserflow_session, success
+• credits_used, error_message, status
+• search_term, search_city, search_country
+• name, image_url, tagline, location, summary
+        """)
 
 # TAB 4: GOOGLE SHEETS VIEW
 with tab4:
@@ -693,7 +853,7 @@ with tab4:
     with col1:
         st.info("💡 Data auto-refreshes every 60 seconds. Click 'Load Sheets' or 'Refresh' for immediate update.")
     with col2:
-        if st.button("🔄 Refresh All Data Now", use_container_width=True, type="primary"):
+        if st.button("🔄 Refresh All Data Now", width="stretch", type="primary"):
             st.cache_data.clear()
             st.rerun()
 
@@ -1206,7 +1366,7 @@ Best of luck with everything,
             data=csv_sample_daily.getvalue(),
             file_name="daily_tracker_template.csv",
             mime="text/csv",
-            use_container_width=True
+            width="stretch"
         )
     
     with col2:
@@ -1234,7 +1394,7 @@ Best of luck with everything,
             data=csv_sample_leads.getvalue(),
             file_name="leads_database_template.csv",
             mime="text/csv",
-            use_container_width=True
+            width="stretch"
         )
     
     st.markdown("---")
