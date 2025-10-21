@@ -76,7 +76,7 @@ st.markdown("""
 DAILY_TRACKER_SHEET_ID = "1UkuTf8VwGPIilTxhTEdP9K-zdtZFnThazFdGyxVYfmg"
 LEADS_DATABASE_SHEET_ID = "1eLEFvyV1_f74UC1g5uQ-xA7A62sK8Pog27KIjw_Sk3Y"
 DAILY_TRACKER_SHEET_NAME = "daily_tracker_20251021"
-LEADS_SHEET_NAME = "Sheet1"
+LEADS_SHEET_NAME = "linkedin-tracking-csv.csv"
 
 # Function to get sheet data by name
 def get_sheet_by_name(sheet_id, sheet_name):
